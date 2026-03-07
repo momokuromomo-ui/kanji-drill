@@ -796,11 +796,15 @@ function pageDrill() {
       <div style="width:48px;height:48px;border-radius:14px;background:rgba(255,255,255,0.15);display:flex;align-items:center;justify-content:center;font-size:24px;">🏆</div>
       <div style="text-align:left;">
         <div style="font-size:16px;font-weight:900;color:white;margin-bottom:2px;">まとめテスト</div>
-        <div style="font-size:12px;color:#a5b4fc;font-weight:700;">全レベルから ${allQs.length}もん</div>
+        <div style="font-size:12px;color:#a5b4fc;font-weight:700;">全レベルからランダム 10もん</div>
       </div>
     </div>
     <div style="font-size:13px;font-weight:800;color:white;background:rgba(255,255,255,0.15);border-radius:10px;padding:6px 12px;">チャレンジ →</div>`;
-  sumBtn.onclick = () => { S.level = "summary"; S.ps = makePracticeState(allQs); S.screen = "practice"; render(); };
+  sumBtn.onclick = () => {
+    var shuffled = allQs.slice().sort(function(){ return Math.random()-0.5; });
+    var picked = shuffled.slice(0, 10);
+    S.level = "summary"; S.ps = makePracticeState(picked); S.screen = "practice"; render();
+  };
   div.appendChild(sumBtn);
   app.appendChild(div);
 }
@@ -842,6 +846,16 @@ function pagePractice() {
     var total   = ps.questions.length;
     var msg = correct===total ? "🌟 かんぺき！すごい！" : correct>=total*0.7 ? "⭐ よくできました！" : correct>=total*0.4 ? "💪 もう少し！がんばれ！" : "📖 また れんしゅう しよう！";
     var isClearedNow = S.level !== "summary" && correct === total;
+    var allLevelsCleared = (function() {
+      if (S.level === "summary") return false;
+      var sess = S.active;
+      if (!sess) return false;
+      var cleared = true;
+      LC.forEach(function(lc) {
+        if (!isClear(sess.title, lc.title)) cleared = false;
+      });
+      return cleared;
+    })();
     var lc2 = S.level !== "summary" ? LC[S.level-1] : null;
 
     var banner = el("div","result-banner pop-in"); banner.style.marginTop="8px";
@@ -849,8 +863,10 @@ function pagePractice() {
       <div style="color:#a5b4fc;font-size:13px;letter-spacing:2px;margin-bottom:8px;">さいてん けっか</div>
       <div style="color:white;font-size:50px;font-weight:900;line-height:1;">${correct}<span style="font-size:20px;color:#a5b4fc;font-weight:400;"> / ${total}もん</span></div>
       <div style="font-size:24px;margin-top:12px;">${msg}</div>
-      ${isClearedNow ? `<div style="margin-top:16px;background:rgba(255,255,255,0.15);border-radius:14px;padding:14px 20px;"><div style="font-size:28px;margin-bottom:4px;">🎉</div><div style="font-size:22px;font-weight:900;color:#fde68a;letter-spacing:2px;">レベルクリア！</div><div style="font-size:13px;color:#a5b4fc;margin-top:4px;">${lc2 ? lc2.title : ""} をクリアしました</div></div>` : ""}`;
+      ${isClearedNow ? `<div style="margin-top:16px;background:rgba(255,255,255,0.15);border-radius:14px;padding:14px 20px;"><div style="font-size:28px;margin-bottom:4px;">🎉</div><div style="font-size:22px;font-weight:900;color:#fde68a;letter-spacing:2px;">レベルクリア！</div><div style="font-size:13px;color:#a5b4fc;margin-top:4px;">${lc2 ? lc2.title : ""} をクリアしました</div></div>` : ""}
+      ${allLevelsCleared ? `<div style="margin-top:16px;background:linear-gradient(135deg,#fde68a,#fbbf24);border-radius:18px;padding:20px;text-align:center;"><div style="font-size:48px;margin-bottom:8px;">🏆</div><div style="font-size:26px;font-weight:900;color:#92400e;letter-spacing:2px;">ぜんぶクリア！！</div><div style="font-size:15px;color:#78350f;margin-top:6px;font-weight:700;">すべてのレベルをせいふくしたよ！</div></div>` : ""}`;
     div.appendChild(banner);
+    if (allLevelsCleared) { setTimeout(launchFireworks, 300); }
 
     var resetBtn = el("button","btn-ghost"); resetBtn.style.marginTop="10px"; resetBtn.textContent = "🔄 もう一度やる";
     resetBtn.onclick = () => { S.ps = makePracticeState(ps.questions); render(); };
@@ -1083,6 +1099,50 @@ function parseSen(s){
 }
 
 render();
+
+function launchFireworks() {
+  var canvas = document.createElement("canvas");
+  canvas.style.cssText = "position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:9999;";
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  document.body.appendChild(canvas);
+  var ctx = canvas.getContext("2d");
+  var particles = [];
+  var colors = ["#fde68a","#fb923c","#f87171","#a78bfa","#34d399","#60a5fa","#f472b6"];
+  for (var b = 0; b < 8; b++) {
+    var bx = Math.random() * canvas.width;
+    var by = Math.random() * canvas.height * 0.6;
+    for (var p = 0; p < 40; p++) {
+      var angle = (p / 40) * Math.PI * 2;
+      var speed = 2 + Math.random() * 4;
+      particles.push({
+        x: bx, y: by,
+        vx: Math.cos(angle) * speed,
+        vy: Math.sin(angle) * speed,
+        alpha: 1,
+        color: colors[Math.floor(Math.random() * colors.length)],
+        r: 3 + Math.random() * 3
+      });
+    }
+  }
+  var frame = 0;
+  function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    particles.forEach(function(p) {
+      p.x += p.vx; p.y += p.vy; p.vy += 0.08; p.alpha -= 0.018;
+      ctx.globalAlpha = Math.max(0, p.alpha);
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r, 0, Math.PI*2);
+      ctx.fillStyle = p.color;
+      ctx.fill();
+    });
+    frame++;
+    if (frame < 80) requestAnimationFrame(draw);
+    else { canvas.remove(); }
+  }
+  draw();
+}
+
 </script>
 </body>
 </html>
