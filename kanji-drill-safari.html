@@ -1450,10 +1450,12 @@ function makeCell(size, onDraw, verdict, allowClear, restoreData) {
   cv.addEventListener("mouseup",     ()=>{draw=false;if(hasDrawn&&onDraw)onDraw(cv.toDataURL());});
   cv.addEventListener("mouseleave",  ()=>{draw=false;});
   cv.addEventListener("touchstart",  e=>{e.preventDefault();draw=true;last=pos(e);hasDrawn=true;},{passive:false});
-  cv.addEventListener("touchmove",   e=>{e.preventDefault();if(!draw)return;var p=pos(e);stroke(p,e.touches[0].force||0.5);last=p;},{passive:false});
+  cv.addEventListener("touchmove",   e=>{e.preventDefault();if(!draw)return;var p=pos(e);var f=e.touches[0].force||0;stroke(p,f);last=p;},{passive:false});
   cv.addEventListener("touchend",    e=>{e.preventDefault();draw=false;if(hasDrawn&&onDraw)onDraw(cv.toDataURL());},{passive:false});
-  function stroke(p, force=0.5){
-    ctx.strokeStyle="#1c1c2e"; ctx.lineWidth=Math.max(3,force*8+2);
+  function stroke(p, force){
+    var f = (force && force > 0) ? force : 0.5;
+    var w = Math.max(8, f * 24 + 6);
+    ctx.strokeStyle="#1c1c2e"; ctx.lineWidth=w;
     ctx.lineCap="round"; ctx.lineJoin="round";
     ctx.beginPath(); ctx.moveTo(last.x,last.y); ctx.lineTo(p.x,p.y); ctx.stroke();
   }
