@@ -1364,7 +1364,7 @@ function buildQCard(q, qi, ps) {
     var row = el("div"); row.style.cssText = "display:flex;align-items:center;gap:14px;flex-wrap:wrap;";
     var cellGroup = el("div"); cellGroup.style.cssText = "display:flex;gap:10px;flex-wrap:wrap;align-items:center;";
     chars.forEach((_,ci) => {
-      var cell = makeCell(120, d => { drawn[ci]=d; }, ps.verdicts[qi]||null, !shown && !ps.verdicts[qi], drawn[ci]);
+      var cell = makeCell(200, d => { drawn[ci]=d; }, ps.verdicts[qi]||null, !shown && !ps.verdicts[qi], drawn[ci]);
       cellGroup.appendChild(cell);
     });
     row.appendChild(cellGroup);
