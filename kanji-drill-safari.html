@@ -58,6 +58,15 @@ button, input { font-family: inherit; }
   border: 2px solid #f0e6d3; background:white;
   color:#78716c; font-weight:700; font-size:15px; cursor:pointer;
 }
+@keyframes animalGlow {
+  from { filter:drop-shadow(0 0 6px #fbbf24); transform:scale(1); }
+  to   { filter:drop-shadow(0 0 18px #f59e0b); transform:scale(1.12); }
+}
+@keyframes animalPop {
+  0%   { transform:scale(0.3) rotate(-15deg); opacity:0; }
+  70%  { transform:scale(1.2) rotate(5deg); }
+  100% { transform:scale(1) rotate(0); opacity:1; }
+}
 .session-row {
   background:white; border:2px solid #f0e6d3; border-radius:18px;
   padding:16px 20px; margin-bottom:12px;
@@ -105,20 +114,20 @@ var SK = "kanji_drill_v5";
 
 var LS = {
   _mem: {},
-  getItem(k) {
+  getItem: function(k) {
     try { return localStorage.getItem(k); } catch(e) { return this._mem[k] !== undefined ? this._mem[k] : null; }
   },
-  setItem(k, v) {
+  setItem: function(k, v) {
     try { localStorage.setItem(k, v); } catch(e) {}
     this._mem[k] = v;
   },
-  removeItem(k) {
+  removeItem: function(k) {
     try { localStorage.removeItem(k); } catch(e) {}
     delete this._mem[k];
   }
 };
 
-["kanji_drill_v1","kanji_drill_v2","kanji_drill_v3","kanji_drill_v4"].forEach(k => LS.removeItem(k));
+["kanji_drill_v1","kanji_drill_v2","kanji_drill_v3","kanji_drill_v4"].forEach(function(k) { LS.removeItem(k); });
 
 var BUILTIN = [
   {
@@ -241,8 +250,8 @@ var BUILTIN = [
                                 "answer": "国政"
                         },
                         {
-                                "sentence": "{オオゼイ}のさかんな若い人々が集まる。",
-                                "answer": "大勢"
+                                "sentence": "おおぜいの{イキオ}いがさかんな若い人々が集まる。",
+                                "answer": "勢"
                         },
                         {
                                 "sentence": "{セイシン}状態が安定する。",
@@ -286,8 +295,8 @@ var BUILTIN = [
                                 "answer": "政府"
                         },
                         {
-                                "sentence": "おおぜいの{イキオ}いのさかんな若い人々が集まる。",
-                                "answer": "大勢"
+                                "sentence": "おおぜいの{イキオ}いがさかんな若い人々が集まる。",
+                                "answer": "勢"
                         },
                         {
                                 "sentence": "芸の道に{ショウジン}する。",
@@ -448,7 +457,7 @@ var BUILTIN = [
         "level": 1,
         "questions": [
           {
-            "sentence": "国語の{セイセキ}が上がる。",
+            "sentence": "国語の{セイセキ}を残す。",
             "answer": "成績"
           },
           {
@@ -480,8 +489,8 @@ var BUILTIN = [
             "answer": "造船"
           },
           {
-            "sentence": "未来の姿を{ゾウゾウ}する。",
-            "answer": "想像"
+            "sentence": "{ガゾウ}の美しいテレビ。",
+            "answer": "画像"
           },
           {
             "sentence": "体力を{ゾウキョウ}する。",
@@ -509,7 +518,7 @@ var BUILTIN = [
             "answer": "絶好"
           },
           {
-            "sentence": "新しい宗派の{ソセン}の墓にお参りする。",
+            "sentence": "{ソセン}の墓にお参りする。",
             "answer": "祖先"
           },
           {
@@ -542,7 +551,7 @@ var BUILTIN = [
             "answer": "業績"
           },
           {
-            "sentence": "{メンセツ}試験を受けるような話だ。",
+            "sentence": "{メンセツ}試験を受ける。",
             "answer": "面接"
           },
           {
@@ -550,8 +559,8 @@ var BUILTIN = [
             "answer": "設"
           },
           {
-            "sentence": "野生動物の種を{コンゼツ}する。",
-            "answer": "根絶"
+            "sentence": "野生動物の種が{た}える。",
+            "answer": "絶"
           },
           {
             "sentence": "{ソボ}に料理を教わる。",
@@ -570,8 +579,8 @@ var BUILTIN = [
             "answer": "木造"
           },
           {
-            "sentence": "{ガゾウ}の美しいテレビ。",
-            "answer": "画像"
+            "sentence": "未来の姿を{ゾウゾウ}する。",
+            "answer": "想像"
           },
           {
             "sentence": "台風で川の水量が{ま}す。",
@@ -827,11 +836,11 @@ function load() {
     var saved = JSON.parse(LS.getItem(SK)||"[]");
     var base = JSON.parse(JSON.stringify(BUILTIN));
     if (Array.isArray(saved)) {
-      saved.forEach(s => {
-        if (s && s.id && !base.find(b => b.id === s.id)) base.push(s);
+      saved.forEach(function(s) {
+        if (s && s.id && !base.find(function(b) { return b.id === s.id; })) base.push(s);
       });
     }
-    base.sort((a,b) => (a.id||0) - (b.id||0));
+    base.sort(function(a,b) { return (a.id||0) - (b.id||0); });
     return base.length > 0 ? base : JSON.parse(JSON.stringify(BUILTIN));
   } catch(e) {
     return JSON.parse(JSON.stringify(BUILTIN));
@@ -855,11 +864,14 @@ function addHistory(record) {
 
 function isClear(sessionTitle, levelTitle) {
   var h = loadHistory();
-  return h.some(r =>
-    r.sessionTitle === sessionTitle &&
-    r.levelTitle === levelTitle &&
-    r.correct / r.total >= 1.0
-  );
+  var found = false;
+  for (var i = 0; i < h.length; i++) {
+    var r = h[i];
+    if (r.sessionTitle === sessionTitle && r.levelTitle === levelTitle && r.correct / r.total >= 1.0) {
+      found = true; break;
+    }
+  }
+  return found;
 }
 
 var S = {
@@ -883,7 +895,7 @@ function render() {
   if (S.screen !== "home") {
     var b = document.createElement("button");
     b.className = "back-btn"; b.textContent = "← もどる";
-    b.onclick = () => {
+    b.onclick = function() {
       if (S.screen === "practice") { S.screen = "drill"; S.ps = null; }
       else if (S.screen === "drill") { S.screen = "kanji"; }
       else if (S.screen === "kanji") { S.screen = "home"; S.active = null; }
@@ -916,7 +928,7 @@ function pageKanji() {
   var detail = el("div");
   detail.style.cssText = "margin-bottom:20px;";
 
-  kanjiData.forEach((kd) => {
+  kanjiData.forEach(function(kd) {
     var chip = el("button");
     chip.style.cssText = `background:white;border:2.5px solid #f0e6d3;border-radius:14px;
       padding:10px 4px;display:flex;flex-direction:column;align-items:center;gap:4px;
@@ -925,8 +937,8 @@ function pageKanji() {
       <div style="font-size:28px;font-weight:900;color:#1e1e1e;">${kd.kanji}</div>
       <div style="font-size:10px;color:#9ca3af;font-weight:600;">${((kd.readings && kd.readings[0] && kd.readings[0].reading) || kd.reading || "").split("\u30fb")[0]}</div>`;
 
-    chip.onclick = () => {
-      grid.querySelectorAll("button").forEach(b => {
+    chip.onclick = function() {
+      grid.querySelectorAll("button").forEach(function(b) {
         b.style.borderColor="#f0e6d3"; b.style.background="white"; b.style.transform="";
       });
       chip.style.borderColor="#c1121f"; chip.style.background="#fff0f0"; chip.style.transform="scale(1.05)";
@@ -943,7 +955,7 @@ function pageKanji() {
     card.style.cssText = `background:white;border:2.5px solid #c1121f;border-radius:20px;
       padding:20px 22px;box-shadow:0 4px 20px rgba(193,18,31,0.12);`;
     var readingsArr = kd.readings || [];
-    var readingsHtml = readingsArr.map(r => {
+    var readingsHtml = readingsArr.map(function(r) {
       var rubyExample = r.example.split(kd.kanji).join(
         `<span style="color:#c1121f;font-weight:900;">${kd.kanji}</span>`
       );
@@ -956,7 +968,7 @@ function pageKanji() {
       </div>`;
     }).join("");
 
-    var jukugoHtml = (kd.jukugo||[]).map(j => {
+    var jukugoHtml = (kd.jukugo||[]).map(function(j) {
       var word = typeof j === "string" ? j : j.word;
       var rd   = typeof j === "string" ? "" : j.reading;
       return `<span style="background:#fff8f0;border:1.5px solid #f0e6d3;border-radius:10px;
@@ -985,7 +997,7 @@ function pageKanji() {
 
   var startBtn = el("button","btn-red");
   startBtn.innerHTML = `<span style="font-size:20px;">✏️</span> ドリルをはじめる`;
-  startBtn.onclick = () => { S.screen="drill"; render(); };
+  startBtn.onclick = function() { S.screen="drill"; render(); };
   div.appendChild(startBtn);
 
   app.appendChild(div);
@@ -1006,16 +1018,18 @@ function pageHome() {
     lbl.textContent = `保存済みのドリル（${S.sessions.length}回分）`;
     div.appendChild(lbl);
 
-    S.sessions.forEach(sess => {
+    S.sessions.forEach(function(sess) {
       var num = (sess.title.match(/\d+/) || ["?"])[0];
       var total = (sess.levels ? sess.levels.reduce(function(s,l){return s+l.questions.length;},0) : 0);
       var row = el("div","session-row");
+      var animalHtml = makeAnimalCard(sess.title, true);
       row.innerHTML = `
         <div style="display:flex;align-items:center;gap:14px;flex:1;min-width:0;">
-          <div style="width:50px;height:50px;flex-shrink:0;border-radius:14px;
-            background:linear-gradient(135deg,#fff0f0,#ffe0e0);border:2px solid #f0e6d3;
-            display:flex;align-items:center;justify-content:center;
-            font-size:20px;font-weight:900;color:#c1121f;">${num}</div>
+          <div style="width:60px;height:60px;flex-shrink:0;border-radius:14px;
+            background:linear-gradient(135deg,#fff8f0,#fef3e2);border:2px solid #f0e6d3;
+            display:flex;align-items:center;justify-content:center;">
+            ${animalHtml}
+          </div>
           <div style="min-width:0;">
             <div style="font-size:17px;font-weight:900;color:#1e1b4b;margin-bottom:3px;">${sess.title}</div>
             <div style="font-size:12px;color:#9ca3af;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${sess.kanjiList||""}</div>
@@ -1023,20 +1037,20 @@ function pageHome() {
           </div>
         </div>
         <button class="del" style="background:none;border:none;cursor:pointer;color:#d1d5db;font-size:20px;padding:6px 8px;border-radius:8px;flex-shrink:0;">🗑</button>`;
-      row.querySelector(".del").onclick = e => {
+      row.querySelector(".del").onclick = function(e) {
         e.stopPropagation();
         var delBtn = row.querySelector(".del");
         if (delBtn.dataset.confirm === "1") {
-          S.sessions = S.sessions.filter(s=>s.id!==sess.id);
+          S.sessions = S.sessions.filter(function(s) { return s.id!==sess.id; });
           save(S.sessions); render();
         } else {
           delBtn.dataset.confirm = "1";
           delBtn.textContent = "削除する";
           delBtn.style.cssText += "background:#fee2e2;color:#dc2626;font-size:13px;font-weight:800;border-radius:8px;padding:6px 8px;border:1.5px solid #dc2626;";
-          setTimeout(() => { if (delBtn.dataset.confirm) { delBtn.dataset.confirm=""; delBtn.textContent="🗑"; delBtn.style.background=""; delBtn.style.color="#d1d5db"; delBtn.style.border="none"; delBtn.style.fontSize="20px"; } }, 3000);
+          setTimeout(function() { if (delBtn.dataset.confirm) { delBtn.dataset.confirm=""; delBtn.textContent="🗑"; delBtn.style.background=""; delBtn.style.color="#d1d5db"; delBtn.style.border="none"; delBtn.style.fontSize="20px"; } }, 3000);
         }
       };
-      row.onclick = e => { if(e.target.classList.contains("del")) return; S.active=sess; S.screen="kanji"; render(); };
+      row.onclick = function(e) { if(e.target.classList.contains("del")) return; S.active=sess; S.screen="kanji"; render(); };
       div.appendChild(row);
     });
   }
@@ -1044,7 +1058,7 @@ function pageHome() {
   var addBtn = el("button","btn-red");
   addBtn.innerHTML = `<span style="font-size:22px;">＋</span> 新しい回を追加（JSONファイル）`;
   addBtn.style.display = "none";
-  addBtn.onclick = () => go("add");
+  addBtn.onclick = function() { go("add"); };
   div.appendChild(addBtn);
 
   app.appendChild(div);
@@ -1076,29 +1090,29 @@ function pageAdd() {
     <div style="font-size:13px;color:#9ca3af;">タップしてファイルを選択</div>`;
   var fileInput = document.createElement("input");
   fileInput.type="file"; fileInput.accept=".json,application/json"; fileInput.style.display="none";
-  fileInput.onchange = e => handleJSON(e.target.files[0]);
+  fileInput.onchange = function(e) { handleJSON(e.target.files[0]); };
   div.appendChild(fileInput);
-  zone.onmouseenter = () => { zone.style.borderColor="#c1121f"; zone.style.background="#fff8f0"; };
-  zone.onmouseleave = () => { zone.style.borderColor="#f0e6d3"; zone.style.background="#fffef9"; };
-  zone.onclick = () => fileInput.click();
-  zone.ondragover = e => { e.preventDefault(); zone.style.borderColor="#c1121f"; };
-  zone.ondragleave = () => zone.style.borderColor="#f0e6d3";
-  zone.ondrop = e => { e.preventDefault(); handleJSON(e.dataTransfer.files[0]); };
+  zone.onmouseenter = function() { zone.style.borderColor="#c1121f"; zone.style.background="#fff8f0"; };
+  zone.onmouseleave = function() { zone.style.borderColor="#f0e6d3"; zone.style.background="#fffef9"; };
+  zone.onclick = function() { fileInput.click(); };
+  zone.ondragover = function(e) { e.preventDefault(); zone.style.borderColor="#c1121f"; };
+  zone.ondragleave = function() { zone.style.borderColor="#f0e6d3"; };
+  zone.ondrop = function(e) { e.preventDefault(); handleJSON(e.dataTransfer.files[0]); };
   div.appendChild(zone);
   var cancelBtn = el("button","btn-ghost");
   cancelBtn.textContent = "← もどる";
-  cancelBtn.onclick = () => go("home");
+  cancelBtn.onclick = function() { go("home"); };
   div.appendChild(cancelBtn);
 
   function handleJSON(file) {
     if (!file) return;
     var reader = new FileReader();
-    reader.onload = () => {
+    reader.onload = function() {
       try {
         var data = JSON.parse(reader.result);
         if (!data.title || !data.levels || !Array.isArray(data.levels)) throw new Error("形式が正しくありません");
         if (!data.id) data.id = Date.now();
-        var exists = S.sessions.find(s => s.id === data.id || s.title === data.title);
+        var exists = S.sessions.find(function(s) { return s.id === data.id || s.title === data.title; });
         if (exists) {
           zone.innerHTML = `<div style="text-align:center;padding:10px;">
             <div style="font-size:16px;font-weight:800;margin-bottom:12px;">「${data.title}」は既に保存されています。</div>
@@ -1106,11 +1120,11 @@ function pageAdd() {
               <button id="overwrite-yes" style="padding:10px 22px;border-radius:12px;border:none;background:#c1121f;color:white;font-weight:800;font-size:14px;cursor:pointer;font-family:inherit;">上書きする</button>
               <button id="overwrite-no" style="padding:10px 22px;border-radius:12px;border:1.5px solid #d1d5db;background:white;color:#374151;font-weight:700;font-size:14px;cursor:pointer;font-family:inherit;">キャンセル</button>
             </div></div>`;
-          document.getElementById('overwrite-yes').onclick = () => { S.sessions = S.sessions.filter(s => s.id !== exists.id); S.sessions = [data, ...S.sessions]; save(S.sessions); finishImport(data); };
-          document.getElementById('overwrite-no').onclick = () => { S.screen='home'; render(); };
+          document.getElementById('overwrite-yes').onclick = function() { S.sessions = S.sessions.filter(function(s) { return s.id !== exists.id; }); S.sessions = [data].concat(S.sessions); save(S.sessions); finishImport(data); };
+          document.getElementById('overwrite-no').onclick = function() { S.screen='home'; render(); };
           return;
         }
-        S.sessions = [data, ...S.sessions];
+        S.sessions = [data].concat(S.sessions);
         save(S.sessions);
         finishImport(data);
       } catch(e) {
@@ -1123,7 +1137,7 @@ function pageAdd() {
   function finishImport(data) {
     zone.innerHTML = `<div class="pop-in" style="color:#16a34a;text-align:center;"><div style="font-size:42px;margin-bottom:10px;">✅</div><div style="font-size:16px;font-weight:900;margin-bottom:4px;">「${data.title}」を追加しました！</div><div style="font-size:13px;color:#166534;">${data.kanjiList||""}</div></div>`;
     zone.style.borderColor = "#16a34a"; zone.style.background = "#f0fdf4";
-    setTimeout(() => { S.active=data; S.screen="kanji"; render(); }, 1200);
+    setTimeout(function() { S.active=data; S.screen="kanji"; render(); }, 1200);
   }
   app.appendChild(div);
 }
@@ -1134,6 +1148,58 @@ var LC = [
   { id:3, title:"レベル3 ⭐⭐⭐",  label:"すこしむずかしい",  color:"#f59e0b", emoji:"🔥" },
   { id:4, title:"レベル4 ⭐⭐⭐⭐", label:"チャレンジ！",      color:"#c1121f", emoji:"🏆" },
 ];
+
+// 各回の動物シリーズ（0=未クリア, 1=L1, 2=L2, 3=L3, 4=L4クリア）
+var ANIMAL_SERIES = {
+  1:  { name:"ライオン",  emoji:["🐾","🐱","🐈","🐯","🦁"],  label:["？","こねこ","ねこ","とら","ライオン王！"] },
+  2:  { name:"クマ",      emoji:["🐾","🐻","🦝","🐼","🏆"],  label:["？","こぐま","たぬき","パンダ","クマ大王！"] },
+  3:  { name:"イヌ",      emoji:["🐾","🐶","🐕","🦮","🐩"],  label:["？","こいぬ","いぬ","もうどうけん","チャンピオン！"] },
+  4:  { name:"ウマ",      emoji:["🐾","🐴","🏇","🎠","🦄"],  label:["？","こうま","うま","きしゃ","ユニコーン！"] },
+  5:  { name:"サル",      emoji:["🐾","🐒","🦧","🦍","👑"],  label:["？","こざる","さる","チンパンジー","ゴリラ王！"] },
+  6:  { name:"トリ",      emoji:["🐾","🐣","🐥","🦆","🦅"],  label:["？","ひよこ","こどり","かも","イーグル！"] },
+  7:  { name:"キツネ",    emoji:["🐾","🐺","🦊","🦊","🌟"],  label:["？","こオオカミ","キツネ","ギンギツネ","キツネ大神！"] },
+  8:  { name:"ゾウ",      emoji:["🐾","🐘","🦏","🦛","🌟"],  label:["？","こぞう","サイ","カバ","ゾウ大王！"] },
+  9:  { name:"ウサギ",    emoji:["🐾","🐰","🐇","🐇","✨"],   label:["？","こうさぎ","うさぎ","はくうさぎ","うさぎ仙人！"] },
+  10: { name:"カワウソ",  emoji:["🐾","🐿","🦔","🦫","🦦"],  label:["？","リス","ハリネズミ","ビーバー","カワウソ王！"] },
+};
+
+// 回タイトルから番号を取得
+function getSessionNum(title) {
+  var m = title.match(/\d+/);
+  return m ? parseInt(m[0]) : 1;
+}
+
+// その回のクリア済みレベル数を取得（0〜4）
+function getClearedCount(sessionTitle) {
+  var count = 0;
+  LC.forEach(function(lc) {
+    if (isClear(sessionTitle, lc.title)) count++;
+  });
+  return count;
+}
+
+// 動物カードHTMLを生成
+function makeAnimalCard(sessionTitle, mini) {
+  var num = getSessionNum(sessionTitle);
+  var series = ANIMAL_SERIES[num] || ANIMAL_SERIES[1];
+  var cleared = getClearedCount(sessionTitle);
+  var emoji = series.emoji[cleared];
+  var name = series.label[cleared];
+  var isMax = cleared === 4;
+  if (mini) {
+    return '<div style="text-align:center;line-height:1;">'
+      + '<div style="font-size:38px;' + (isMax ? 'animation:animalGlow 1.2s infinite alternate;' : '') + '">' + emoji + '</div>'
+      + '<div style="font-size:10px;color:' + (isMax ? '#fde68a' : '#9ca3af') + ';font-weight:700;margin-top:2px;">' + name + '</div>'
+      + '</div>';
+  }
+  return '<div style="text-align:center;background:' + (isMax ? 'linear-gradient(135deg,#1a1200,#2d1f00)' : '#f9f5ef')
+    + ';border-radius:16px;padding:14px 10px;border:2px solid ' + (isMax ? '#fbbf24' : '#f0e6d3') + ';margin-bottom:12px;">'
+    + '<div style="font-size:56px;line-height:1;' + (isMax ? 'filter:drop-shadow(0 0 12px #fbbf24);' : '') + '">' + emoji + '</div>'
+    + '<div style="font-size:13px;font-weight:900;color:' + (isMax ? '#fde68a' : '#92400e') + ';margin-top:6px;">' + name + '</div>'
+    + '<div style="font-size:11px;color:' + (isMax ? '#f59e0b' : '#9ca3af') + ';margin-top:2px;">レベル' + cleared + ' / 4 クリア</div>'
+    + (cleared < 4 ? '<div style="font-size:12px;color:#c1121f;font-weight:800;margin-top:8px;letter-spacing:0.5px;">次は何かな❓<br>レベルアップさせよう🔥</div>' : '')
+    + '</div>';
+}
 
 function pageDrill() {
   var sess = S.active;
@@ -1146,7 +1212,7 @@ function pageDrill() {
     <div style="font-size:12px;color:#9ca3af;margin-top:6px;">レベルをえらんでちょうせんしよう！</div>`;
   div.appendChild(info);
 
-  LC.forEach(lc => {
+  LC.forEach(function(lc) {
     var qs = (sess.levels && sess.levels[lc.id-1] && sess.levels[lc.id-1].questions) || [];
     var cleared = isClear(sess.title, lc.title);
     var btn = el("button","level-btn");
@@ -1161,11 +1227,16 @@ function pageDrill() {
         </div>
       </div>
       <div style="font-size:13px;font-weight:800;color:${cleared ? "#16a34a" : lc.color};background:${cleared ? "#16a34a15" : lc.color+"15"};border-radius:10px;padding:6px 12px;">${cleared ? "もう一度 →" : "スタート →"}</div>`;
-    btn.onmouseenter = () => { btn.style.transform="translateY(-2px)"; btn.style.boxShadow=`0 6px 20px ${lc.color}22`; };
-    btn.onmouseleave = () => { btn.style.transform=""; btn.style.boxShadow="0 2px 12px rgba(0,0,0,0.06)"; };
-    btn.onclick = () => { S.level = lc.id; S.ps = makePracticeState(qs); S.screen = "practice"; render(); };
+    btn.onmouseenter = function() { btn.style.transform="translateY(-2px)"; btn.style.boxShadow=`0 6px 20px ${lc.color}22`; };
+    btn.onmouseleave = function() { btn.style.transform=""; btn.style.boxShadow="0 2px 12px rgba(0,0,0,0.06)"; };
+    btn.onclick = function() { S.level = lc.id; S.ps = makePracticeState(qs); S.screen = "practice"; render(); };
     div.appendChild(btn);
   });
+
+  // 動物カード表示
+  var animalDiv = el("div");
+  animalDiv.innerHTML = makeAnimalCard(sess.title, false);
+  div.appendChild(animalDiv);
 
   var allQs = (sess.levels ? sess.levels.reduce(function(a,l){return a.concat(l.questions);}, []) : []);
   var sumBtn = el("button");
@@ -1179,8 +1250,8 @@ function pageDrill() {
       </div>
     </div>
     <div style="font-size:13px;font-weight:800;color:white;background:rgba(255,255,255,0.15);border-radius:10px;padding:6px 12px;">チャレンジ →</div>`;
-  sumBtn.onclick = () => {
-    var shuffled = allQs.slice().sort(function(){ return Math.random()-0.5; });
+  sumBtn.onclick = function() {
+    var shuffled = allQs.slice().sort(function() { return Math.random()-0.5; });
     var picked = shuffled.slice(0, 10);
     S.level = "summary"; S.ps = makePracticeState(picked); S.screen = "practice"; render();
   };
@@ -1207,12 +1278,12 @@ function pagePractice() {
   div.appendChild(bar);
 
   if (!ps.done) {
-    ps.questions.forEach((q,qi) => div.appendChild(buildQCard(q,qi,ps)));
+    ps.questions.forEach(function(q,qi) { div.appendChild(buildQCard(q,qi,ps)); });
     var wrap = el("div"); wrap.id="res-wrap";
     div.appendChild(wrap);
     updateResWrap(ps);
   } else {
-    ps.questions.forEach((q,qi) => {
+    ps.questions.forEach(function(q,qi) {
       var {before,kana,after} = parseSen(q.sentence);
       var v = ps.verdicts[qi];
       var row = el("div");
@@ -1221,7 +1292,7 @@ function pagePractice() {
       div.appendChild(row);
     });
 
-    var correct = Object.values(ps.verdicts).filter(v=>v==="correct").length;
+    var correct = Object.values(ps.verdicts).filter(function(v) { return v==="correct"; }).length;
     var total   = ps.questions.length;
     var msg = correct===total ? "🌟 かんぺき！すごい！" : correct>=total*0.7 ? "⭐ よくできました！" : correct>=total*0.4 ? "💪 もう少し！がんばれ！" : "📖 また れんしゅう しよう！";
     var isClearedNow = S.level !== "summary" && correct === total;
@@ -1245,10 +1316,11 @@ function pagePractice() {
       ${isClearedNow ? `<div style="margin-top:16px;background:rgba(255,255,255,0.15);border-radius:14px;padding:14px 20px;"><div style="font-size:28px;margin-bottom:4px;">🎉</div><div style="font-size:22px;font-weight:900;color:#fde68a;letter-spacing:2px;">レベルクリア！</div><div style="font-size:13px;color:#a5b4fc;margin-top:4px;">${lc2 ? lc2.title : ""} をクリアしました</div></div>` : ""}
       ${allLevelsCleared ? `<div style="margin-top:16px;background:linear-gradient(135deg,#fde68a,#fbbf24);border-radius:18px;padding:20px;text-align:center;"><div style="font-size:48px;margin-bottom:8px;">🏆</div><div style="font-size:26px;font-weight:900;color:#92400e;letter-spacing:2px;">ぜんぶクリア！！</div><div style="font-size:15px;color:#78350f;margin-top:6px;font-weight:700;">すべてのレベルをせいふくしたよ！</div></div>` : ""}`;
     div.appendChild(banner);
+    if (isClearedNow) { setTimeout(function(){ showAnimalGrowth(S.active ? S.active.title : ""); }, 400); }
     if (allLevelsCleared) { setTimeout(launchFireworks, 300); }
 
     var resetBtn = el("button","btn-ghost"); resetBtn.style.marginTop="10px"; resetBtn.textContent = "🔄 もう一度やる";
-    resetBtn.onclick = () => { S.ps = makePracticeState(ps.questions); render(); };
+    resetBtn.onclick = function() { S.ps = makePracticeState(ps.questions); render(); };
     div.appendChild(resetBtn);
   }
 
@@ -1263,10 +1335,10 @@ function updateResWrap(ps) {
   wrap.innerHTML = "";
   if (g === ps.questions.length) {
     var btn = el("button","btn-red"); btn.style.marginTop="4px"; btn.innerHTML = "🏆 けっか を みる";
-    btn.onclick = () => {
+    btn.onclick = function() {
       ps.done = true;
-      var correct = Object.values(ps.verdicts).filter(v=>v==="correct").length;
-      var wrongs = ps.questions.filter((_,qi) => ps.verdicts[qi]==="wrong").map(q => ({ sentence: q.sentence, answer: q.answer }));
+      var correct = Object.values(ps.verdicts).filter(function(v) { return v==="correct"; }).length;
+      var wrongs = ps.questions.filter(function(_,qi) { return ps.verdicts[qi]==="wrong"; }).map(function(q) { return { sentence: q.sentence, answer: q.answer }; });
       var lc = S.level !== "summary" ? LC[S.level-1] : null;
       addHistory({ date: new Date().toISOString(), sessionTitle: (S.active ? S.active.title : ""), levelTitle: lc ? lc.title : "まとめテスト", total: ps.questions.length, correct, wrongs });
       pagePractice();
@@ -1288,14 +1360,14 @@ function pageHistory() {
   }
 
   var allWrongs = {};
-  history.forEach(r => { if (r.wrongs) r.wrongs.forEach(function(w) { var k = w.answer; if (!allWrongs[k]) allWrongs[k] = 0; allWrongs[k]++; }); });
-  var wrongEntries = Object.entries(allWrongs).sort((a,b)=>b[1]-a[1]);
+  history.forEach(function(r) { if (r.wrongs) r.wrongs.forEach(function(w) { var k = w.answer; if (!allWrongs[k]) allWrongs[k] = 0; allWrongs[k]++; }); });
+  var wrongEntries = Object.entries(allWrongs).sort(function(a,b) { return b[1]-a[1]; });
 
   if (wrongEntries.length > 0) {
     var wCard = el("div","card"); wCard.style.marginBottom = "20px";
     wCard.innerHTML = `<div style="font-size:14px;font-weight:800;color:#dc2626;margin-bottom:12px;">❌ 苦手な漢字</div>`;
     var wGrid = el("div"); wGrid.style.cssText = "display:flex;flex-wrap:wrap;gap:8px;";
-    wrongEntries.slice(0,20).forEach(([kanji, count]) => {
+    wrongEntries.slice(0,20).forEach(function(entry) { var kanji=entry[0]; var count=entry[1];
       var chip = el("div");
       chip.style.cssText = `background:#fff0f0;border:2px solid #fecaca;border-radius:10px;padding:6px 12px;display:flex;align-items:center;gap:6px;`;
       chip.innerHTML = `<span style="font-size:18px;font-weight:900;color:#1e1e1e;">${kanji}</span><span style="font-size:11px;color:#dc2626;font-weight:700;">${count}回ミス</span>`;
@@ -1307,7 +1379,7 @@ function pageHistory() {
   var listLabel = el("div"); listLabel.style.cssText = "font-size:13px;color:#9ca3af;font-weight:600;margin-bottom:12px;letter-spacing:1px;"; listLabel.textContent = `取り組み記録（${history.length}件）`;
   div.appendChild(listLabel);
 
-  history.forEach(r => {
+  history.forEach(function(r) {
     var d = new Date(r.date);
     var dateStr = `${d.getFullYear()}/${d.getMonth()+1}/${d.getDate()}`;
     var timeStr = `${String(d.getHours()).padStart(2,"0")}:${String(d.getMinutes()).padStart(2,"0")}`;
@@ -1324,23 +1396,23 @@ function pageHistory() {
         <div style="flex:1;height:6px;background:#f0e6d3;border-radius:3px;overflow:hidden;"><div style="width:${pct}%;height:100%;background:${color};border-radius:3px;transition:width 0.5s;"></div></div>
         <div style="font-size:11px;color:#9ca3af;white-space:nowrap;">${dateStr} ${timeStr}</div>
       </div>
-      ${r.wrongs && r.wrongs.length>0 ? `<div style="margin-top:8px;padding-top:8px;border-top:1px solid #f0e6d3;"><span style="font-size:11px;color:#dc2626;font-weight:700;">ミス：</span>${r.wrongs.map(w=>`<span style="font-size:13px;font-weight:800;color:#1e1e1e;margin-right:6px;">${w.answer}</span>`).join("")}</div>` : ""}`;
+      ${r.wrongs && r.wrongs.length>0 ? "<div style='margin-top:8px;padding-top:8px;border-top:1px solid #f0e6d3;'><span style='font-size:11px;color:#dc2626;font-weight:700;'>ミス：</span>" + r.wrongs.map(function(w) { return "<span style='font-size:13px;font-weight:800;color:#1e1e1e;margin-right:6px;'>" + w.answer + "</span>"; }).join("") + "</div>" : ""}`;
     div.appendChild(row);
   });
 
   var clearWrap = el("div"); clearWrap.style.cssText = "margin-top:8px;";
   var clearBtn = el("button","btn-ghost"); clearBtn.textContent = "🗑 履歴をすべて削除";
-  clearBtn.onclick = () => {
+  clearBtn.onclick = function() {
     clearWrap.innerHTML = "";
     var confirm_div = el("div");
     confirm_div.style.cssText = `background:#fff0f0;border:2px solid #fecaca;border-radius:14px;padding:16px;text-align:center;`;
     confirm_div.innerHTML = `<div style="font-size:14px;font-weight:700;color:#dc2626;margin-bottom:12px;">本当に全件削除しますか？</div>`;
     var yesBtn = el("button"); yesBtn.textContent = "はい、削除する";
     yesBtn.style.cssText = `background:#dc2626;color:white;border:none;border-radius:10px;padding:10px 20px;font-weight:800;font-size:14px;cursor:pointer;margin-right:8px;font-family:inherit;`;
-    yesBtn.onclick = () => { saveHistory([]); render(); };
+    yesBtn.onclick = function() { saveHistory([]); render(); };
     var noBtn = el("button"); noBtn.textContent = "キャンセル";
     noBtn.style.cssText = `background:white;color:#6b7280;border:2px solid #e5e7eb;border-radius:10px;padding:10px 20px;font-weight:700;font-size:14px;cursor:pointer;font-family:inherit;`;
-    noBtn.onclick = () => { clearWrap.innerHTML=""; clearWrap.appendChild(clearBtn); };
+    noBtn.onclick = function() { clearWrap.innerHTML=""; clearWrap.appendChild(clearBtn); };
     confirm_div.appendChild(yesBtn); confirm_div.appendChild(noBtn); clearWrap.appendChild(confirm_div);
   };
   clearWrap.appendChild(clearBtn); div.appendChild(clearWrap); app.appendChild(div);
@@ -1363,8 +1435,8 @@ function buildQCard(q, qi, ps) {
     card.appendChild(top);
     var row = el("div"); row.style.cssText = "display:flex;align-items:center;gap:14px;flex-wrap:wrap;";
     var cellGroup = el("div"); cellGroup.style.cssText = "display:flex;gap:10px;flex-wrap:wrap;align-items:center;";
-    chars.forEach((_,ci) => {
-      var cell = makeCell(200, d => { drawn[ci]=d; }, ps.verdicts[qi]||null, !shown && !ps.verdicts[qi], drawn[ci]);
+    chars.forEach(function(_,ci) {
+      var cell = makeCell(200, function(d) { drawn[ci]=d; }, ps.verdicts[qi]||null, !shown && !ps.verdicts[qi], drawn[ci]);
       cellGroup.appendChild(cell);
     });
     row.appendChild(cellGroup);
@@ -1372,12 +1444,12 @@ function buildQCard(q, qi, ps) {
     if (!shown) {
       var ab = el("button"); ab.id=`ab${qi}`;
       ab.style.cssText=`padding:12px 16px;border-radius:14px;border:none;background:linear-gradient(135deg,#c1121f,#780000);color:white;font-weight:800;font-size:14px;cursor:pointer;font-family:inherit;white-space:nowrap;`;
-      ab.textContent="📖 こたえをみる"; ab.onclick=()=>{ shown=true; rebuild(); };
+      ab.textContent="📖 こたえをみる"; ab.onclick=function() { shown=true; rebuild(); };
       ctrl.appendChild(ab);
     } else {
       var aw = el("div","pop-in"); aw.style.cssText = "display:flex;flex-direction:column;align-items:center;gap:4px;";
       var ar = el("div"); ar.style.cssText="display:flex;gap:5px;flex-wrap:wrap;justify-content:center;";
-      chars.forEach(c => {
+      chars.forEach(function(c) {
         var b = el("div");
         b.style.cssText=`width:44px;height:44px;border:2px solid #d4b896;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:900;background:#fffef5;`;
         b.textContent=c; ar.appendChild(b);
@@ -1388,18 +1460,18 @@ function buildQCard(q, qi, ps) {
         var btns=el("div","pop-in"); btns.style.cssText="display:flex;gap:6px;justify-content:center;";
         var ok=el("button"); ok.textContent="⭕";
         ok.style.cssText=`width:52px;height:52px;border-radius:14px;border:2.5px solid #16a34a;background:white;font-size:26px;cursor:pointer;display:flex;align-items:center;justify-content:center;`;
-        ok.onmouseenter=()=>ok.style.background="#dcfce7"; ok.onmouseleave=()=>ok.style.background="white";
-        ok.onclick=()=>{ ps.verdicts[qi]="correct"; updateResWrap(ps); shown=true; rebuild(); };
+        ok.onmouseenter=function(){ok.style.background="#dcfce7";}; ok.onmouseleave=function(){ok.style.background="white";};
+        ok.onclick=function() { ps.verdicts[qi]="correct"; updateResWrap(ps); shown=true; rebuild(); };
         var ng=el("button"); ng.textContent="✕";
         ng.style.cssText=`width:52px;height:52px;border-radius:14px;border:2.5px solid #dc2626;background:white;font-size:22px;font-weight:900;cursor:pointer;display:flex;align-items:center;justify-content:center;`;
-        ng.onmouseenter=()=>ng.style.background="#fee2e2"; ng.onmouseleave=()=>ng.style.background="white";
-        ng.onclick=()=>{ ps.verdicts[qi]="wrong"; updateResWrap(ps); shown=true; rebuild(); };
+        ng.onmouseenter=function(){ng.style.background="#fee2e2";}; ng.onmouseleave=function(){ng.style.background="white";};
+        ng.onclick=function() { ps.verdicts[qi]="wrong"; updateResWrap(ps); shown=true; rebuild(); };
         btns.appendChild(ok); btns.appendChild(ng); ctrl.appendChild(btns);
       }
       if (ps.verdicts[qi]) {
         var u=el("button"); u.textContent="やり直し";
         u.style.cssText=`padding:8px 10px;border-radius:10px;border:1.5px solid #d1d5db;background:white;color:#6b7280;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;text-align:center;`;
-        u.onclick=()=>{ delete ps.verdicts[qi]; shown=false; updateResWrap(ps); rebuild(); };
+        u.onclick=function() { delete ps.verdicts[qi]; shown=false; updateResWrap(ps); rebuild(); };
         ctrl.appendChild(u);
       }
     }
@@ -1425,7 +1497,7 @@ function makeCell(size, onDraw, verdict, allowClear, restoreData) {
     ctx.setLineDash([]);
   }
   grid();
-  if (restoreData) { var img = new Image(); img.onload = () => ctx.drawImage(img, 0, 0, cv.width, cv.height); img.src = restoreData; }
+  if (restoreData) { var img = new Image(); img.onload = function() { ctx.drawImage(img, 0, 0, cv.width, cv.height); }; img.src = restoreData; }
   if (verdict) {
     var s=size*2;
     if (verdict==="correct") {
@@ -1445,13 +1517,13 @@ function makeCell(size, onDraw, verdict, allowClear, restoreData) {
     var s=e.touches?e.touches[0]:e;
     return {x:(s.clientX-r.left)*sx, y:(s.clientY-r.top)*sy};
   }
-  cv.addEventListener("mousedown",   e=>{draw=true;last=pos(e);hasDrawn=true;});
-  cv.addEventListener("mousemove",   e=>{if(!draw)return;var p=pos(e);stroke(p);last=p;});
-  cv.addEventListener("mouseup",     ()=>{draw=false;if(hasDrawn&&onDraw)onDraw(cv.toDataURL());});
-  cv.addEventListener("mouseleave",  ()=>{draw=false;});
-  cv.addEventListener("touchstart",  e=>{e.preventDefault();draw=true;last=pos(e);hasDrawn=true;},{passive:false});
-  cv.addEventListener("touchmove",   e=>{e.preventDefault();if(!draw)return;var p=pos(e);var f=e.touches[0].force||0;stroke(p,f);last=p;},{passive:false});
-  cv.addEventListener("touchend",    e=>{e.preventDefault();draw=false;if(hasDrawn&&onDraw)onDraw(cv.toDataURL());},{passive:false});
+  cv.addEventListener("mousedown",   function(e) {draw=true;last=pos(e);hasDrawn=true;});
+  cv.addEventListener("mousemove",   function(e) {if(!draw)return;var p=pos(e);stroke(p);last=p;});
+  cv.addEventListener("mouseup", function() {draw=false;if(hasDrawn&&onDraw)onDraw(cv.toDataURL());});
+  cv.addEventListener("mouseleave", function() {draw=false;});
+  cv.addEventListener("touchstart",  function(e) {e.preventDefault();draw=true;last=pos(e);hasDrawn=true;},{passive:false});
+  cv.addEventListener("touchmove",   function(e) {e.preventDefault();if(!draw)return;var p=pos(e);var f=e.touches[0].force||0;stroke(p,f);last=p;},{passive:false});
+  cv.addEventListener("touchend",    function(e) {e.preventDefault();draw=false;if(hasDrawn&&onDraw)onDraw(cv.toDataURL());},{passive:false});
   function stroke(p, force){
     var f = (force && force > 0) ? force : 0.5;
     var w = Math.max(8, f * 24 + 6);
@@ -1462,7 +1534,7 @@ function makeCell(size, onDraw, verdict, allowClear, restoreData) {
   if (allowClear) {
     var cb=document.createElement("button"); cb.textContent="✕";
     cb.style.cssText=`position:absolute;top:-9px;right:-9px;width:22px;height:22px;border-radius:50%;border:none;background:#94a3b8;color:white;font-size:11px;cursor:pointer;padding:0;display:flex;align-items:center;justify-content:center;`;
-    cb.onclick=e=>{ e.stopPropagation(); ctx.clearRect(0,0,cv.width,cv.height); grid(); oct.clearRect(0,0,ov.width,ov.height); hasDrawn=false; if(onDraw) onDraw(null); };
+    cb.onclick=function(e) { e.stopPropagation(); ctx.clearRect(0,0,cv.width,cv.height); grid(); oct.clearRect(0,0,ov.width,ov.height); hasDrawn=false; if(onDraw) onDraw(null); };
     wrap.appendChild(cb);
   }
   wrap.appendChild(cv); wrap.appendChild(ov);
@@ -1481,6 +1553,66 @@ function parseSen(s){
 
 render();
 
+
+function showAnimalGrowth(sessionTitle) {
+  var num = getSessionNum(sessionTitle);
+  var series = ANIMAL_SERIES[num] || ANIMAL_SERIES[1];
+  var cleared = getClearedCount(sessionTitle);
+  if (cleared === 0) return;
+  var prevEmoji = series.emoji[cleared - 1];
+  var newEmoji  = series.emoji[cleared];
+  var newName   = series.label[cleared];
+  var isMax = cleared === 4;
+
+  var overlay = document.createElement("div");
+  overlay.className = "growth-overlay";
+  overlay.style.cssText = "position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:10000;display:flex;align-items:center;justify-content:center;";
+
+  var box = document.createElement("div");
+  var bgColor = isMax ? "linear-gradient(135deg,#1a1200,#2d1f00)" : "linear-gradient(135deg,#fff8f0,#fef3e2)";
+  var borderColor = isMax ? "#fbbf24" : "#f0e6d3";
+  var titleColor = isMax ? "#fde68a" : "#92400e";
+  var arrowColor = isMax ? "#fde68a" : "#f59e0b";
+  var nameColor = isMax ? "#fde68a" : "#92400e";
+  var subColor = isMax ? "#f59e0b" : "#9ca3af";
+  var btnBg = isMax ? "linear-gradient(135deg,#fbbf24,#f59e0b)" : "linear-gradient(135deg,#c1121f,#780000)";
+  var btnColor = isMax ? "#1c1500" : "white";
+  var glowStyle = isMax ? "filter:drop-shadow(0 0 16px #fbbf24);" : "";
+
+  box.style.cssText = "background:" + bgColor + ";border-radius:28px;padding:32px 28px;text-align:center;max-width:300px;width:90%;border:3px solid " + borderColor + ";box-shadow:0 20px 60px rgba(0,0,0,0.5);";
+
+  var titleDiv = document.createElement("div");
+  titleDiv.style.cssText = "font-size:14px;font-weight:900;color:" + titleColor + ";letter-spacing:2px;margin-bottom:16px;";
+  titleDiv.textContent = "🎉 レベルクリア！";
+
+  var animDiv = document.createElement("div");
+  animDiv.style.cssText = "display:flex;align-items:center;justify-content:center;gap:16px;margin-bottom:20px;";
+  animDiv.innerHTML = "<div style='font-size:52px;opacity:0.4;'>" + prevEmoji + "</div>"
+    + "<div style='font-size:28px;color:" + arrowColor + ";'>→</div>"
+    + "<div style='font-size:64px;animation:animalPop 0.6s cubic-bezier(0.34,1.56,0.64,1) forwards;" + glowStyle + "'>" + newEmoji + "</div>";
+
+  var nameDiv = document.createElement("div");
+  nameDiv.style.cssText = "font-size:22px;font-weight:900;color:" + nameColor + ";margin-bottom:6px;";
+  nameDiv.textContent = newName;
+
+  var subDiv = document.createElement("div");
+  subDiv.style.cssText = "font-size:12px;color:" + subColor + ";margin-bottom:20px;";
+  subDiv.textContent = "なかまが せいちょう したよ！";
+
+  var btn = document.createElement("button");
+  btn.style.cssText = "background:" + btnBg + ";color:" + btnColor + ";border:none;border-radius:14px;padding:12px 32px;font-size:15px;font-weight:900;cursor:pointer;font-family:inherit;";
+  btn.textContent = "やったー！";
+  btn.onclick = function() { overlay.remove(); };
+
+  box.appendChild(titleDiv);
+  box.appendChild(animDiv);
+  box.appendChild(nameDiv);
+  box.appendChild(subDiv);
+  box.appendChild(btn);
+  overlay.appendChild(box);
+  overlay.onclick = function(e) { if (e.target === overlay) overlay.remove(); };
+  document.body.appendChild(overlay);
+}
 function launchFireworks() {
   var canvas = document.createElement("canvas");
   canvas.style.cssText = "position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:9999;";
