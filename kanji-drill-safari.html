@@ -1,0 +1,1529 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="かんじドリル">
+<meta name="theme-color" content="#c1121f">
+<link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%23c1121f'/><text y='.9em' font-size='70' x='50%' text-anchor='middle'>📖</text></svg>">
+<title>📖 かんじドリル</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Meiryo UI','Meiryo','メイリオ','Hiragino Kaku Gothic ProN','sans-serif';
+  background: linear-gradient(160deg,#fdf6ec 0%,#fef3e2 60%,#fff8f0 100%);
+  min-height: 100vh;
+  min-height: -webkit-fill-available;
+}
+button, input { font-family: inherit; }
+
+.header {
+  background: linear-gradient(135deg,#c1121f,#780000);
+  padding: 15px 22px;
+  padding-top: max(15px, env(safe-area-inset-top));
+  display: flex; align-items: center; gap: 14px;
+  box-shadow: 0 4px 20px rgba(193,18,31,0.25);
+  position: sticky; top: 0; z-index: 100;
+}
+.header h1 { color:white; font-size:20px; font-weight:900; letter-spacing:3px; }
+.back-btn {
+  background: rgba(255,255,255,0.2); border: none; border-radius: 8px;
+  color: white; padding: 6px 13px; cursor: pointer; font-size:14px; font-weight:700;
+}
+.container { max-width:640px; margin:0 auto; padding:24px 16px; padding-bottom:40px; }
+
+@keyframes slideUp { from{transform:translateY(16px);opacity:0} to{transform:translateY(0);opacity:1} }
+@keyframes popIn  { from{transform:scale(0.8);opacity:0} to{transform:scale(1);opacity:1} }
+@keyframes spin   { to{transform:rotate(360deg)} }
+.slide-up { animation: slideUp 0.3s ease; }
+.pop-in   { animation: popIn 0.3s ease; }
+
+.card {
+  background: white; border-radius: 18px; padding: 18px 20px;
+  margin-bottom: 12px; box-shadow: 0 2px 14px rgba(0,0,0,0.07);
+  border: 2px solid #f0e6d3;
+}
+.btn-red {
+  width:100%; padding:17px; border-radius:16px; border:none;
+  background: linear-gradient(135deg,#c1121f,#780000);
+  color:white; font-weight:900; font-size:17px; cursor:pointer;
+  box-shadow: 0 4px 18px rgba(193,18,31,0.3);
+  display:flex; align-items:center; justify-content:center; gap:10px;
+  margin-bottom:10px;
+}
+.btn-ghost {
+  width:100%; padding:13px; border-radius:14px;
+  border: 2px solid #f0e6d3; background:white;
+  color:#78716c; font-weight:700; font-size:15px; cursor:pointer;
+}
+.session-row {
+  background:white; border:2px solid #f0e6d3; border-radius:18px;
+  padding:16px 20px; margin-bottom:12px;
+  box-shadow:0 2px 12px rgba(0,0,0,0.06);
+  display:flex; align-items:center; justify-content:space-between;
+  cursor:pointer; transition: transform 0.15s, box-shadow 0.15s;
+}
+.session-row:hover { transform:translateY(-2px); box-shadow:0 6px 20px rgba(193,18,31,0.1); }
+.level-btn {
+  width:100%; background:white; border-radius:18px; padding:16px 20px;
+  margin-bottom:12px; cursor:pointer; border:none;
+  display:flex; align-items:center; justify-content:space-between;
+  box-shadow:0 2px 12px rgba(0,0,0,0.06);
+  transition:transform 0.15s, box-shadow 0.15s;
+}
+.q-card {
+  background:white; border-radius:18px; padding:18px 20px 16px;
+  margin-bottom:14px; box-shadow:0 2px 16px rgba(0,0,0,0.07);
+  border:2px solid #f0e6d3; transition:border-color 0.3s;
+}
+.q-card.correct { border:2.5px solid #16a34a; }
+.q-card.wrong   { border:2.5px solid #dc2626; }
+.q-card.shown   { border:2px solid #f59e0b; }
+.result-banner {
+  background: linear-gradient(135deg,#1e1b4b,#312e81);
+  border-radius:20px; padding:28px 24px; text-align:center;
+  margin-bottom:12px; box-shadow:0 8px 32px rgba(30,27,75,0.25);
+}
+canvas { touch-action: none; }
+</style>
+</head>
+<body>
+
+<div class="header" id="header">
+  <h1>📖 かんじ ドリル</h1>
+  <button id="hist-btn" onclick="S.screen='history';render();" style="
+    margin-left:auto;background:rgba(255,255,255,0.2);border:none;border-radius:8px;
+    color:white;padding:6px 13px;cursor:pointer;font-size:14px;font-weight:700;
+    font-family:inherit;white-space:nowrap;">📊 履歴</button>
+</div>
+<div class="container" id="app"></div>
+
+<script>
+var SK = "kanji_drill_v5";
+
+var LS = {
+  _mem: {},
+  getItem(k) {
+    try { return localStorage.getItem(k); } catch(e) { return this._mem[k] !== undefined ? this._mem[k] : null; }
+  },
+  setItem(k, v) {
+    try { localStorage.setItem(k, v); } catch(e) {}
+    this._mem[k] = v;
+  },
+  removeItem(k) {
+    try { localStorage.removeItem(k); } catch(e) {}
+    delete this._mem[k];
+  }
+};
+
+["kanji_drill_v1","kanji_drill_v2","kanji_drill_v3","kanji_drill_v4"].forEach(k => LS.removeItem(k));
+
+var BUILTIN = [
+  {
+    "id": 1,
+    "title": "第1回",
+    "kanjiList": "織・職・制・性・政・勢・精・製・税・責",
+    "levels": [
+
+        {
+                "level": 1,
+                "questions": [
+                        {
+                                "sentence": "もみじを{オリモノ}に染める。",
+                                "answer": "織物"
+                        },
+                        {
+                                "sentence": "市役所の{ショクギョウ}選択の自由。",
+                                "answer": "職業"
+                        },
+                        {
+                                "sentence": "教育{セイド}を見直す。",
+                                "answer": "制度"
+                        },
+                        {
+                                "sentence": "{ヒンセイ}いやしからぬ人。",
+                                "answer": "品性"
+                        },
+                        {
+                                "sentence": "国民のための{セイジ}。",
+                                "answer": "政治"
+                        },
+                        {
+                                "sentence": "強い{セイリョク}の台風。",
+                                "answer": "勢力"
+                        },
+                        {
+                                "sentence": "{セイマイ}したてのお米。",
+                                "answer": "精米"
+                        },
+                        {
+                                "sentence": "家具を{セイサク}する。",
+                                "answer": "製作"
+                        },
+                        {
+                                "sentence": "国に{ゼイキン}を納める。",
+                                "answer": "税金"
+                        },
+                        {
+                                "sentence": "{ジセキ}の念が強い人だ。",
+                                "answer": "自責"
+                        }
+                ]
+        },
+        {
+                "level": 2,
+                "questions": [
+                        {
+                                "sentence": "物を{ソシキ}する。",
+                                "answer": "組織"
+                        },
+                        {
+                                "sentence": "{ショクム}を果たす。",
+                                "answer": "職務"
+                        },
+                        {
+                                "sentence": "法律が{セイテイ}される。",
+                                "answer": "制定"
+                        },
+                        {
+                                "sentence": "{セイサン}性を高める。",
+                                "answer": "生産"
+                        },
+                        {
+                                "sentence": "国の{ザイセイ}を立て直す。",
+                                "answer": "財政"
+                        },
+                        {
+                                "sentence": "国際{ジョウセイ}を調べる。",
+                                "answer": "情勢"
+                        },
+                        {
+                                "sentence": "海外事情に{セイツウ}する。",
+                                "answer": "精通"
+                        },
+                        {
+                                "sentence": "かんづめの{セイゾウ}年月日。",
+                                "answer": "製造"
+                        },
+                        {
+                                "sentence": "国民が{ゲンゼイ}を願う。",
+                                "answer": "減税"
+                        },
+                        {
+                                "sentence": "首相の失政を{セ}める。",
+                                "answer": "責"
+                        }
+                ]
+        },
+        {
+                "level": 3,
+                "questions": [
+                        {
+                                "sentence": "労働組合を{ソシキ}する。",
+                                "answer": "組織"
+                        },
+                        {
+                                "sentence": "働きやすい{ショクバ}の技に見入る。",
+                                "answer": "職場"
+                        },
+                        {
+                                "sentence": "{セイゲン}速度を守る。",
+                                "answer": "制限"
+                        },
+                        {
+                                "sentence": "氏名と{セイベツ}を記す。",
+                                "answer": "性別"
+                        },
+                        {
+                                "sentence": "{コクセイ}選挙が行われる。",
+                                "answer": "国政"
+                        },
+                        {
+                                "sentence": "{オオゼイ}のさかんな若い人々が集まる。",
+                                "answer": "大勢"
+                        },
+                        {
+                                "sentence": "{セイシン}状態が安定する。",
+                                "answer": "精神"
+                        },
+                        {
+                                "sentence": "{ジカセイ}の味噌を食べる。",
+                                "answer": "自家製"
+                        },
+                        {
+                                "sentence": "{ゼイリツ}を引き下げる。",
+                                "answer": "税率"
+                        },
+                        {
+                                "sentence": "{セキニン}感が強い人だ。",
+                                "answer": "責任"
+                        }
+                ]
+        },
+        {
+                "level": 4,
+                "questions": [
+                        {
+                                "sentence": "自動{ショッキ}を発明した人物。",
+                                "answer": "織機"
+                        },
+                        {
+                                "sentence": "働きやすい{ショクニン}の技に見入る。",
+                                "answer": "職人"
+                        },
+                        {
+                                "sentence": "絵の{セイサク}にいそしむ。",
+                                "answer": "制作"
+                        },
+                        {
+                                "sentence": "困難に負けない{コンジョウ}。",
+                                "answer": "根性"
+                        },
+                        {
+                                "sentence": "首相が{セイフ}を率いる。",
+                                "answer": "政府"
+                        },
+                        {
+                                "sentence": "おおぜいの{イキオ}いのさかんな若い人々が集まる。",
+                                "answer": "大勢"
+                        },
+                        {
+                                "sentence": "芸の道に{ショウジン}する。",
+                                "answer": "精進"
+                        },
+                        {
+                                "sentence": "かんづめの{セイヒン}を出荷する。",
+                                "answer": "製品"
+                        },
+                        {
+                                "sentence": "輸入品に{カゼイ}する。",
+                                "answer": "課税"
+                        },
+                        {
+                                "sentence": "社長の{ジュウセキ}を担う。",
+                                "answer": "重責"
+                        }
+                ]
+        }
+
+      ],
+    "kanjiData": [
+      {"kanji": "織", "readings": [
+        {"type": "音読み", "reading": "シキ・（ショク）", "example": "労働組合を組織する。", "exampleKanji": [{"kanji": "組織", "reading": "そしき"}]},
+        {"type": "訓読み", "reading": "お（る）", "example": "布を織る機械。", "exampleKanji": []}
+      ], "jukugo": [{"word": "組織", "reading": "そしき"}, {"word": "織物", "reading": "おりもの"}, {"word": "染織", "reading": "せんしょく"}]},
+      {"kanji": "職", "readings": [
+        {"type": "音読み", "reading": "ショク", "example": "働きやすい職場に見入る。", "exampleKanji": [{"kanji": "職場", "reading": "しょくば"}]}
+      ], "jukugo": [{"word": "職業", "reading": "しょくぎょう"}, {"word": "職場", "reading": "しょくば"}, {"word": "職務", "reading": "しょくむ"}, {"word": "職人", "reading": "しょくにん"}]},
+      {"kanji": "制", "readings": [
+        {"type": "音読み", "reading": "セイ", "example": "教育制度を見直す。", "exampleKanji": [{"kanji": "制度", "reading": "せいど"}]}
+      ], "jukugo": [{"word": "制度", "reading": "せいど"}, {"word": "制限", "reading": "せいげん"}, {"word": "制作", "reading": "せいさく"}, {"word": "節制", "reading": "せっせい"}]},
+      {"kanji": "性", "readings": [
+        {"type": "音読み", "reading": "セイ・（ショウ）", "example": "氏名と性別を記す。", "exampleKanji": [{"kanji": "性別", "reading": "せいべつ"}]}
+      ], "jukugo": [{"word": "性別", "reading": "せいべつ"}, {"word": "品性", "reading": "ひんせい"}, {"word": "人間性", "reading": "にんげんせい"}, {"word": "根性", "reading": "こんじょう"}]},
+      {"kanji": "政", "readings": [
+        {"type": "音読み", "reading": "セイ・（ショウ）", "example": "首相が政府を率いる。", "exampleKanji": [{"kanji": "政府", "reading": "せいふ"}]},
+        {"type": "訓読み", "reading": "まつりごと", "example": "国を治める政。", "exampleKanji": []}
+      ], "jukugo": [{"word": "政治", "reading": "せいじ"}, {"word": "政府", "reading": "せいふ"}, {"word": "行政", "reading": "ぎょうせい"}, {"word": "財政", "reading": "ざいせい"}]},
+      {"kanji": "勢", "readings": [
+        {"type": "音読み", "reading": "セイ", "example": "強い勢力の台風。", "exampleKanji": [{"kanji": "勢力", "reading": "せいりょく"}]},
+        {"type": "訓読み", "reading": "いきおい", "example": "台風の勢いが強い。", "exampleKanji": []}
+      ], "jukugo": [{"word": "勢力", "reading": "せいりょく"}, {"word": "大勢", "reading": "おおぜい"}, {"word": "姿勢", "reading": "しせい"}, {"word": "軍勢", "reading": "ぐんぜい"}]},
+      {"kanji": "精", "readings": [
+        {"type": "音読み", "reading": "セイ・（ショウ）", "example": "芸の道に精進する。", "exampleKanji": [{"kanji": "精進", "reading": "しょうじん"}]}
+      ], "jukugo": [{"word": "精神", "reading": "せいしん"}, {"word": "精米", "reading": "せいまい"}, {"word": "精通", "reading": "せいつう"}, {"word": "不精", "reading": "ぶしょう"}]},
+      {"kanji": "製", "readings": [
+        {"type": "音読み", "reading": "セイ", "example": "缶詰の製造年月日。", "exampleKanji": [{"kanji": "製造", "reading": "せいぞう"}]}
+      ], "jukugo": [{"word": "製造", "reading": "せいぞう"}, {"word": "製作", "reading": "せいさく"}, {"word": "自家製", "reading": "じかせい"}, {"word": "外国製", "reading": "がいこくせい"}]},
+      {"kanji": "税", "readings": [
+        {"type": "音読み", "reading": "ゼイ", "example": "国民が税金を納める。", "exampleKanji": [{"kanji": "税金", "reading": "ぜいきん"}]}
+      ], "jukugo": [{"word": "税金", "reading": "ぜいきん"}, {"word": "税務", "reading": "ぜいむ"}, {"word": "課税", "reading": "かぜい"}, {"word": "納税", "reading": "のうぜい"}]},
+      {"kanji": "責", "readings": [
+        {"type": "音読み", "reading": "セキ", "example": "自責の念が強い人だ。", "exampleKanji": [{"kanji": "自責", "reading": "じせき"}]},
+        {"type": "訓読み", "reading": "せ（める）", "example": "首相の失政を責める。", "exampleKanji": []}
+      ], "jukugo": [{"word": "責任", "reading": "せきにん"}, {"word": "自責", "reading": "じせき"}, {"word": "職責", "reading": "しょくせき"}, {"word": "重責", "reading": "じゅうせき"}]}
+    ]
+  },
+  {
+    "id": 4,
+    "title": "第4回",
+    "kanjiList": "貯・張・停・提・程・適・統・堂・銅・導",
+    "levels": [
+      {"level": 1, "questions": [
+        {"sentence": "米を{チョ}蔵しておく。", "answer": "貯"},
+        {"sentence": "弓を{ハ}る。", "answer": "張"},
+        {"sentence": "バスが{テイシャ}する。", "answer": "停車"},
+        {"sentence": "手を{サ}し出す。", "answer": "提"},
+        {"sentence": "仕事の{ホド}合い。", "answer": "程"},
+        {"sentence": "{テキセツ}な言葉を選ぶ。", "answer": "適切"},
+        {"sentence": "一つに{マト}める。", "answer": "統"},
+        {"sentence": "お寺の{ドウ}に集まる。", "answer": "堂"},
+        {"sentence": "{アカガネ}でできた像。", "answer": "銅"},
+        {"sentence": "道を{ミチビ}く。", "answer": "導"}
+      ]},
+      {"level": 2, "questions": [
+        {"sentence": "お年玉を{チョキン}する。", "answer": "貯金"},
+        {"sentence": "自分の意見を{シュチョウ}する。", "answer": "主張"},
+        {"sentence": "争いを{チョウテイ}する。", "answer": "調停"},
+        {"sentence": "宿題を{テイシュツ}する。", "answer": "提出"},
+        {"sentence": "旅行の{ニッテイ}が決まる。", "answer": "日程"},
+        {"sentence": "体に{テキオウ}する。", "answer": "適応"},
+        {"sentence": "人口の{トウケイ}をとる。", "answer": "統計"},
+        {"sentence": "六時に{ショクドウ}へ行く。", "answer": "食堂"},
+        {"sentence": "十円{ドウカ}を発行する。", "answer": "銅貨"},
+        {"sentence": "新技術を{ドウニュウ}する。", "answer": "導入"}
+      ]},
+      {"level": 3, "questions": [
+        {"sentence": "ダムの{チョスイ}量を確認する。", "answer": "貯水"},
+        {"sentence": "父が{シュッチョウ}から帰った。", "answer": "出張"},
+        {"sentence": "各駅{テイシャ}の電車。", "answer": "停車"},
+        {"sentence": "てさげぶくろに荷物を{テイシュツ}する。", "answer": "提出"},
+        {"sentence": "成長の{カテイ}を録画する。", "answer": "過程"},
+        {"sentence": "時代に{テキオウ}した考え。", "answer": "適応"},
+        {"sentence": "千年の{デントウ}がある祭り。", "answer": "伝統"},
+        {"sentence": "コウカイ{ドウ}に集まる。", "answer": "堂"},
+        {"sentence": "足尾{ドウザン}のあと地。", "answer": "銅山"},
+        {"sentence": "コーチが選手を{シドウ}する。", "answer": "指導"}
+      ]},
+      {"level": 4, "questions": [
+        {"sentence": "水道の{チョスイイケ}を見学する。", "answer": "貯水池"},
+        {"sentence": "水の表面{チョウリョク}。", "answer": "張力"},
+        {"sentence": "電車の{テイリュウジョ}で待つ。", "answer": "停留所"},
+        {"sentence": "会議で問題を{テイアン}する。", "answer": "提案"},
+        {"sentence": "工場の{コウテイ}を見学する。", "answer": "工程"},
+        {"sentence": "{カイテキ}な旅行を楽しむ。", "answer": "快適"},
+        {"sentence": "国民を{トウチ}する。", "answer": "統治"},
+        {"sentence": "お寺の{ホンドウ}を建てる。", "answer": "本堂"},
+        {"sentence": "駅前に{ドウゾウ}を建てる。", "answer": "銅像"},
+        {"sentence": "{ハンドウタイ}を使った機器。", "answer": "半導体"}
+      ]}
+    ],
+    "kanjiData": [
+      {"kanji": "貯", "readings": [
+        {"type": "音読み", "reading": "チョ", "example": "お年玉を貯金する。", "exampleKanji": [{"kanji": "貯金", "reading": "ちょきん"}]}
+      ], "jukugo": [{"word": "貯金", "reading": "ちょきん"}, {"word": "貯水", "reading": "ちょすい"}, {"word": "貯蔵", "reading": "ちょぞう"}, {"word": "貯蓄", "reading": "ちょちく"}]},
+      {"kanji": "張", "readings": [
+        {"type": "音読み", "reading": "チョウ", "example": "意見を主張する。", "exampleKanji": [{"kanji": "主張", "reading": "しゅちょう"}]},
+        {"type": "訓読み", "reading": "は（る）", "example": "河原にテントを張る。", "exampleKanji": []}
+      ], "jukugo": [{"word": "主張", "reading": "しゅちょう"}, {"word": "出張", "reading": "しゅっちょう"}, {"word": "拡張", "reading": "かくちょう"}, {"word": "張力", "reading": "ちょうりょく"}]},
+      {"kanji": "停", "readings": [
+        {"type": "音読み", "reading": "テイ", "example": "信号で車が停止する。", "exampleKanji": [{"kanji": "停止", "reading": "ていし"}]}
+      ], "jukugo": [{"word": "停車", "reading": "ていしゃ"}, {"word": "停止", "reading": "ていし"}, {"word": "停電", "reading": "ていでん"}, {"word": "調停", "reading": "ちょうてい"}]},
+      {"kanji": "提", "readings": [
+        {"type": "音読み", "reading": "テイ", "example": "宿題を提出する。", "exampleKanji": [{"kanji": "提出", "reading": "ていしゅつ"}]},
+        {"type": "訓読み", "reading": "さ（げる）", "example": "荷物を提げて歩く。", "exampleKanji": []}
+      ], "jukugo": [{"word": "提出", "reading": "ていしゅつ"}, {"word": "提案", "reading": "ていあん"}, {"word": "提示", "reading": "ていじ"}, {"word": "前提", "reading": "ぜんてい"}]},
+      {"kanji": "程", "readings": [
+        {"type": "音読み", "reading": "テイ", "example": "旅行の日程が決まる。", "exampleKanji": [{"kanji": "日程", "reading": "にってい"}]},
+        {"type": "訓読み", "reading": "ほど", "example": "仕事の程合いをみる。", "exampleKanji": []}
+      ], "jukugo": [{"word": "日程", "reading": "にってい"}, {"word": "工程", "reading": "こうてい"}, {"word": "過程", "reading": "かてい"}, {"word": "行程", "reading": "こうてい"}]},
+      {"kanji": "適", "readings": [
+        {"type": "音読み", "reading": "テキ", "example": "適切な言葉を探す。", "exampleKanji": [{"kanji": "適切", "reading": "てきせつ"}]}
+      ], "jukugo": [{"word": "適切", "reading": "てきせつ"}, {"word": "適当", "reading": "てきとう"}, {"word": "適応", "reading": "てきおう"}, {"word": "快適", "reading": "かいてき"}]},
+      {"kanji": "統", "readings": [
+        {"type": "音読み", "reading": "トウ", "example": "千年の伝統がある祭り。", "exampleKanji": [{"kanji": "伝統", "reading": "でんとう"}]},
+        {"type": "訓読み", "reading": "す（べる）", "example": "二つの銀行を統合する。", "exampleKanji": [{"kanji": "統合", "reading": "とうごう"}]}
+      ], "jukugo": [{"word": "伝統", "reading": "でんとう"}, {"word": "統計", "reading": "とうけい"}, {"word": "統合", "reading": "とうごう"}, {"word": "統制", "reading": "とうせい"}]},
+      {"kanji": "堂", "readings": [
+        {"type": "音読み", "reading": "ドウ", "example": "お寺の本堂を建てる。", "exampleKanji": [{"kanji": "本堂", "reading": "ほんどう"}]}
+      ], "jukugo": [{"word": "本堂", "reading": "ほんどう"}, {"word": "食堂", "reading": "しょくどう"}, {"word": "公会堂", "reading": "こうかいどう"}, {"word": "母堂", "reading": "ぼどう"}]},
+      {"kanji": "銅", "readings": [
+        {"type": "音読み", "reading": "ドウ", "example": "駅前に銅像を建てる。", "exampleKanji": [{"kanji": "銅像", "reading": "どうぞう"}]}
+      ], "jukugo": [{"word": "銅像", "reading": "どうぞう"}, {"word": "銅貨", "reading": "どうか"}, {"word": "銅山", "reading": "どうざん"}, {"word": "青銅", "reading": "せいどう"}]},
+      {"kanji": "導", "readings": [
+        {"type": "音読み", "reading": "ドウ", "example": "新技術を導入する。", "exampleKanji": [{"kanji": "導入", "reading": "どうにゅう"}]},
+        {"type": "訓読み", "reading": "みちび（く）", "example": "コーチが選手を指導する。", "exampleKanji": [{"kanji": "指導", "reading": "しどう"}]}
+      ], "jukugo": [{"word": "指導", "reading": "しどう"}, {"word": "導入", "reading": "どうにゅう"}, {"word": "先導", "reading": "せんどう"}, {"word": "半導体", "reading": "はんどうたい"}]}
+    ]
+  }
+,
+  {
+    "id": 2,
+    "title": "第2回",
+    "kanjiList": "績・接・設・絶・祖・素・総・造・像・増",
+    "levels": [
+      {
+        "level": 1,
+        "questions": [
+          {
+            "sentence": "国語の{セイセキ}が上がる。",
+            "answer": "成績"
+          },
+          {
+            "sentence": "電話線を{セツゾク}する。",
+            "answer": "接続"
+          },
+          {
+            "sentence": "船の{セッケイ}図をかく。",
+            "answer": "設計"
+          },
+          {
+            "sentence": "暴力を{コンゼツ}する。",
+            "answer": "根絶"
+          },
+          {
+            "sentence": "自分の{ソコク}に帰る。",
+            "answer": "祖国"
+          },
+          {
+            "sentence": "{ソザイ}の味を生かした料理。",
+            "answer": "素材"
+          },
+          {
+            "sentence": "四教科の{ソウゴウ}成績を確認する。",
+            "answer": "総合"
+          },
+          {
+            "sentence": "{ゾウセン}業がさかんな町。",
+            "answer": "造船"
+          },
+          {
+            "sentence": "未来の姿を{ゾウゾウ}する。",
+            "answer": "想像"
+          },
+          {
+            "sentence": "体力を{ゾウキョウ}する。",
+            "answer": "増強"
+          }
+        ]
+      },
+      {
+        "level": 2,
+        "questions": [
+          {
+            "sentence": "先人の{コウセキ}をたたえる。",
+            "answer": "功績"
+          },
+          {
+            "sentence": "{チョクセツ}大臣の話を聞く。",
+            "answer": "直接"
+          },
+          {
+            "sentence": "ビルの{ケンセツ}現場で働く。",
+            "answer": "建設"
+          },
+          {
+            "sentence": "船が{ゼッコウ}の行楽日和だ。",
+            "answer": "絶好"
+          },
+          {
+            "sentence": "新しい宗派の{ソセン}の墓にお参りする。",
+            "answer": "祖先"
+          },
+          {
+            "sentence": "赤・青・黄が色の{サンゲンソ}だ。",
+            "answer": "三原素"
+          },
+          {
+            "sentence": "応募{ソウスウ}を公表する。",
+            "answer": "総数"
+          },
+          {
+            "sentence": "内閣の{カイゾウ}が行われる。",
+            "answer": "改造"
+          },
+          {
+            "sentence": "目を閉じても見える{ザンゾウ}。",
+            "answer": "残像"
+          },
+          {
+            "sentence": "市の人口が{ふ}える。",
+            "answer": "増"
+          }
+        ]
+      },
+      {
+        "level": 3,
+        "questions": [
+          {
+            "sentence": "りっぱな{ギョウセキ}を残す。",
+            "answer": "業績"
+          },
+          {
+            "sentence": "{メンセツ}試験を受けるような話だ。",
+            "answer": "面接"
+          },
+          {
+            "sentence": "話し合う機会を{もう}ける。",
+            "answer": "設"
+          },
+          {
+            "sentence": "野生動物の種を{コンゼツ}する。",
+            "answer": "根絶"
+          },
+          {
+            "sentence": "{ソボ}に料理を教わる。",
+            "answer": "祖母"
+          },
+          {
+            "sentence": "反省して{ソコウ}を改める。",
+            "answer": "素行"
+          },
+          {
+            "sentence": "クラスの{ソウイ}を確認する。",
+            "answer": "総意"
+          },
+          {
+            "sentence": "{モクゾウ}二階建ての家。",
+            "answer": "木造"
+          },
+          {
+            "sentence": "{ガゾウ}の美しいテレビ。",
+            "answer": "画像"
+          },
+          {
+            "sentence": "台風で川の水量が{ま}す。",
+            "answer": "増"
+          }
+        ]
+      },
+      {
+        "level": 4,
+        "questions": [
+          {
+            "sentence": "過去の{ジッセキ}を評価する。",
+            "answer": "実績"
+          },
+          {
+            "sentence": "木に竹を{つ}ぐような話だ。",
+            "answer": "接"
+          },
+          {
+            "sentence": "廊下に消火器を{セッチ}する。",
+            "answer": "設置"
+          },
+          {
+            "sentence": "{ゼツダイ}な力をもつ人物。",
+            "answer": "絶大"
+          },
+          {
+            "sentence": "新しい宗派の{キョウソ}。",
+            "answer": "教祖"
+          },
+          {
+            "sentence": "{ヘイソ}のおこないを反省する。",
+            "answer": "平素"
+          },
+          {
+            "sentence": "{ソウリ}大臣に選ばれる。",
+            "answer": "総理"
+          },
+          {
+            "sentence": "引っ越しの{ニヅク}りをする。",
+            "answer": "荷造"
+          },
+          {
+            "sentence": "{ブツゾウ}を彫る。",
+            "answer": "仏像"
+          },
+          {
+            "sentence": "勝つとすぐ{ゾウチョウ}する。",
+            "answer": "増長"
+          }
+        ]
+      }
+    ],
+    "kanjiData": [
+      {
+        "kanji": "績",
+        "readings": [
+          {
+            "type": "音",
+            "reading": "セキ"
+          }
+        ],
+        "examples": [
+          "成績・功績・業績・実績・戦績"
+        ],
+        "compounds": [
+          "成績（なしとげられた実際の仕事）",
+          "功績（社会や仕事のためになりりっぱな成果）",
+          "業績（事業や文化などでなしとげられた成果）"
+        ]
+      },
+      {
+        "kanji": "接",
+        "readings": [
+          {
+            "type": "音",
+            "reading": "セツ"
+          },
+          {
+            "type": "訓",
+            "reading": "つ（ぐ）"
+          }
+        ],
+        "examples": [
+          "接続・直接・面接・接近・接点"
+        ],
+        "compounds": [
+          "接続（つながること）",
+          "直接（間に何もはさまず、じかにふれていること）",
+          "面接（じかにその人に会うこと）"
+        ]
+      },
+      {
+        "kanji": "設",
+        "readings": [
+          {
+            "type": "音",
+            "reading": "セツ"
+          },
+          {
+            "type": "訓",
+            "reading": "もう（ける）"
+          }
+        ],
+        "examples": [
+          "設計・建設・設備・設立・常設"
+        ],
+        "compounds": [
+          "設計（つくる物の図をかくこと）",
+          "建設（建物をつくること）",
+          "設備（会や施設などをそなえること）"
+        ]
+      },
+      {
+        "kanji": "絶",
+        "readings": [
+          {
+            "type": "音",
+            "reading": "ゼツ"
+          },
+          {
+            "type": "訓",
+            "reading": "た（える）・た（やす）・た（つ）"
+          }
+        ],
+        "examples": [
+          "根絶・絶好・絶大・絶海・謝絶"
+        ],
+        "compounds": [
+          "根絶（根本からなくすこと）",
+          "絶好（何かをするのにちょうどよいこと）",
+          "絶大（はなはだ大きいよう）"
+        ]
+      },
+      {
+        "kanji": "祖",
+        "readings": [
+          {
+            "type": "音",
+            "reading": "ソ"
+          }
+        ],
+        "examples": [
+          "祖国・祖先・祖母・教祖・父祖"
+        ],
+        "compounds": [
+          "祖国（自分の生まれ育った国）",
+          "祖先（父と父以前の祖先）",
+          "祖母（父の母または母の母）"
+        ]
+      },
+      {
+        "kanji": "素",
+        "readings": [
+          {
+            "type": "音",
+            "reading": "ソ・（ス）"
+          }
+        ],
+        "examples": [
+          "素材・素行・平素・元素・素質"
+        ],
+        "compounds": [
+          "素材（もとになる材料）",
+          "素行（ふだんのおこない）",
+          "元素（化学的に分解できる最小単位のもの）"
+        ]
+      },
+      {
+        "kanji": "総",
+        "readings": [
+          {
+            "type": "音",
+            "reading": "ソウ"
+          }
+        ],
+        "examples": [
+          "総合・総数・総意・総理・総務"
+        ],
+        "compounds": [
+          "総合（一つにまとめること）",
+          "総数（全体の数）",
+          "総意（全員の考え）"
+        ]
+      },
+      {
+        "kanji": "造",
+        "readings": [
+          {
+            "type": "音",
+            "reading": "ゾウ"
+          },
+          {
+            "type": "訓",
+            "reading": "つく（る）"
+          }
+        ],
+        "examples": [
+          "造船・改造・木造・荷造・造形"
+        ],
+        "compounds": [
+          "造船（船をつくること）",
+          "改造（つくり直すこと）",
+          "木造（木を材料にしてできるもの）"
+        ]
+      },
+      {
+        "kanji": "像",
+        "readings": [
+          {
+            "type": "音",
+            "reading": "ゾウ"
+          }
+        ],
+        "examples": [
+          "想像・残像・画像・仏像・映像"
+        ],
+        "compounds": [
+          "想像（実際に見ていないすがたを心にうかべること）",
+          "残像（形が消えた後もなおそれがあるように感じられること）",
+          "画像（実際に見えるすがた）"
+        ]
+      },
+      {
+        "kanji": "増",
+        "readings": [
+          {
+            "type": "音",
+            "reading": "ゾウ"
+          },
+          {
+            "type": "訓",
+            "reading": "ま（す）・ふ（える）・ふ（やす）"
+          }
+        ],
+        "examples": [
+          "増強・増加・増水・増進・増長"
+        ],
+        "compounds": [
+          "増強（ふやして力を強くすること）",
+          "増加（量や数がふえること）",
+          "増水（川などの水の量がふえること）"
+        ]
+      }
+    ]
+  }];
+
+function save(sessions) {
+  try { LS.setItem(SK, JSON.stringify(sessions)); } catch(e){}
+}
+function load() {
+  try {
+    var saved = JSON.parse(LS.getItem(SK)||"[]");
+    var base = JSON.parse(JSON.stringify(BUILTIN));
+    if (Array.isArray(saved)) {
+      saved.forEach(s => {
+        if (s && s.id && !base.find(b => b.id === s.id)) base.push(s);
+      });
+    }
+    base.sort((a,b) => (a.id||0) - (b.id||0));
+    return base.length > 0 ? base : JSON.parse(JSON.stringify(BUILTIN));
+  } catch(e) {
+    return JSON.parse(JSON.stringify(BUILTIN));
+  }
+}
+
+var HK = "kanji_history_v1";
+
+function loadHistory() {
+  try { return JSON.parse(LS.getItem(HK)||"[]"); } catch { return []; }
+}
+function saveHistory(h) {
+  try { LS.setItem(HK, JSON.stringify(h)); } catch(e){}
+}
+function addHistory(record) {
+  var h = loadHistory();
+  h.unshift(record);
+  if (h.length > 200) h.splice(200);
+  saveHistory(h);
+}
+
+function isClear(sessionTitle, levelTitle) {
+  var h = loadHistory();
+  return h.some(r =>
+    r.sessionTitle === sessionTitle &&
+    r.levelTitle === levelTitle &&
+    r.correct / r.total >= 1.0
+  );
+}
+
+var S = {
+  screen: "home",
+  sessions: load(),
+  active: null,
+  level: null,
+  ps: null,
+};
+
+var app  = document.getElementById("app");
+var hdr  = document.getElementById("header");
+
+function go(screen) { S.screen = screen; render(); }
+
+function render() {
+  app.innerHTML = "";
+  var hb = document.getElementById("hist-btn");
+  if (hb) hb.style.display = (S.screen==="practice") ? "none" : "";
+  var _bb = hdr.querySelector(".back-btn"); if (_bb) _bb.remove();
+  if (S.screen !== "home") {
+    var b = document.createElement("button");
+    b.className = "back-btn"; b.textContent = "← もどる";
+    b.onclick = () => {
+      if (S.screen === "practice") { S.screen = "drill"; S.ps = null; }
+      else if (S.screen === "drill") { S.screen = "kanji"; }
+      else if (S.screen === "kanji") { S.screen = "home"; S.active = null; }
+      else { S.screen = "home"; }
+      render();
+    };
+    hdr.insertBefore(b, hdr.querySelector("h1"));
+  }
+  var pages = { home: pageHome, add: pageAdd, drill: pageDrill, kanji: pageKanji, practice: pagePractice, history: pageHistory };
+  if (pages[S.screen]) pages[S.screen]();
+}
+
+function pageKanji() {
+  var sess = S.active;
+  var kanjiData = sess.kanjiData || [];
+  var div = el("div","slide-up");
+
+  var h2 = el("div");
+  h2.style.cssText = "font-size:18px;font-weight:900;color:#c1121f;margin-bottom:6px;";
+  h2.textContent = `${sess.title} 漢字一覧`;
+  div.appendChild(h2);
+  var sub = el("div");
+  sub.style.cssText = "font-size:13px;color:#9ca3af;margin-bottom:20px;";
+  sub.textContent = "漢字をタップすると詳しく見られます";
+  div.appendChild(sub);
+
+  var grid = el("div");
+  grid.style.cssText = "display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:20px;";
+
+  var detail = el("div");
+  detail.style.cssText = "margin-bottom:20px;";
+
+  kanjiData.forEach((kd) => {
+    var chip = el("button");
+    chip.style.cssText = `background:white;border:2.5px solid #f0e6d3;border-radius:14px;
+      padding:10px 4px;display:flex;flex-direction:column;align-items:center;gap:4px;
+      cursor:pointer;font-family:inherit;transition:all 0.15s;width:100%;`;
+    chip.innerHTML = `
+      <div style="font-size:28px;font-weight:900;color:#1e1e1e;">${kd.kanji}</div>
+      <div style="font-size:10px;color:#9ca3af;font-weight:600;">${((kd.readings && kd.readings[0] && kd.readings[0].reading) || kd.reading || "").split("\u30fb")[0]}</div>`;
+
+    chip.onclick = () => {
+      grid.querySelectorAll("button").forEach(b => {
+        b.style.borderColor="#f0e6d3"; b.style.background="white"; b.style.transform="";
+      });
+      chip.style.borderColor="#c1121f"; chip.style.background="#fff0f0"; chip.style.transform="scale(1.05)";
+      showDetail(kd);
+    };
+    grid.appendChild(chip);
+  });
+  div.appendChild(grid);
+  div.appendChild(detail);
+
+  function showDetail(kd) {
+    detail.innerHTML = "";
+    var card = el("div","pop-in");
+    card.style.cssText = `background:white;border:2.5px solid #c1121f;border-radius:20px;
+      padding:20px 22px;box-shadow:0 4px 20px rgba(193,18,31,0.12);`;
+    var readingsArr = kd.readings || [];
+    var readingsHtml = readingsArr.map(r => {
+      var rubyExample = r.example.split(kd.kanji).join(
+        `<span style="color:#c1121f;font-weight:900;">${kd.kanji}</span>`
+      );
+      return `<div style="background:#fff8f0;border:1.5px solid #f0e6d3;border-radius:12px;padding:12px 14px;margin-bottom:8px;">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+          <span style="background:#c1121f;color:white;font-size:10px;font-weight:800;border-radius:6px;padding:2px 8px;">${r.type}</span>
+          <span style="font-size:18px;font-weight:900;color:#c1121f;">${r.reading}</span>
+        </div>
+        <div style="font-size:16px;color:#374151;font-weight:500;line-height:1.8;">${rubyExample}</div>
+      </div>`;
+    }).join("");
+
+    var jukugoHtml = (kd.jukugo||[]).map(j => {
+      var word = typeof j === "string" ? j : j.word;
+      var rd   = typeof j === "string" ? "" : j.reading;
+      return `<span style="background:#fff8f0;border:1.5px solid #f0e6d3;border-radius:10px;
+        padding:6px 14px;display:inline-flex;flex-direction:column;align-items:center;gap:2px;">
+        <span style="font-size:11px;color:#9ca3af;font-weight:600;">${rd}</span>
+        <span style="font-size:17px;font-weight:800;color:#1e1e1e;">${word}</span>
+      </span>`;
+    }).join("");
+
+    card.innerHTML = `
+      <div style="display:flex;align-items:center;gap:16px;margin-bottom:14px;border-bottom:2px solid #f0e6d3;padding-bottom:14px;">
+        <div style="font-size:64px;font-weight:900;color:#1e1e1e;line-height:1;">${kd.kanji}</div>
+        <div style="font-size:13px;color:#9ca3af;font-weight:600;">よみかたと れいぶん ↓</div>
+      </div>
+      <div style="margin-bottom:14px;">${readingsHtml}</div>
+      <div>
+        <div style="font-size:12px;color:#9ca3af;font-weight:700;margin-bottom:8px;letter-spacing:1px;">熟語の例</div>
+        <div style="display:flex;flex-wrap:wrap;gap:8px;">${jukugoHtml}</div>
+      </div>`;
+    detail.appendChild(card);
+  }
+
+  if (kanjiData.length > 0) {
+    grid.querySelectorAll("button")[0].click();
+  }
+
+  var startBtn = el("button","btn-red");
+  startBtn.innerHTML = `<span style="font-size:20px;">✏️</span> ドリルをはじめる`;
+  startBtn.onclick = () => { S.screen="drill"; render(); };
+  div.appendChild(startBtn);
+
+  app.appendChild(div);
+}
+
+function pageHome() {
+  var div = el("div","slide-up");
+
+  if (S.sessions.length === 0) {
+    div.innerHTML = `<div style="text-align:center;padding:48px 20px 24px;">
+      <div style="font-size:52px;margin-bottom:16px;">📚</div>
+      <div style="font-size:17px;font-weight:800;color:#374151;margin-bottom:8px;">まだドリルがありません</div>
+      <div style="font-size:14px;color:#9ca3af;margin-bottom:24px;">データを読み込んでいます…</div>
+    </div>`;
+  } else {
+    var lbl = el("div");
+    lbl.style.cssText = "font-size:13px;color:#9ca3af;font-weight:600;margin-bottom:12px;letter-spacing:1px;";
+    lbl.textContent = `保存済みのドリル（${S.sessions.length}回分）`;
+    div.appendChild(lbl);
+
+    S.sessions.forEach(sess => {
+      var num = (sess.title.match(/\d+/) || ["?"])[0];
+      var total = (sess.levels ? sess.levels.reduce(function(s,l){return s+l.questions.length;},0) : 0);
+      var row = el("div","session-row");
+      row.innerHTML = `
+        <div style="display:flex;align-items:center;gap:14px;flex:1;min-width:0;">
+          <div style="width:50px;height:50px;flex-shrink:0;border-radius:14px;
+            background:linear-gradient(135deg,#fff0f0,#ffe0e0);border:2px solid #f0e6d3;
+            display:flex;align-items:center;justify-content:center;
+            font-size:20px;font-weight:900;color:#c1121f;">${num}</div>
+          <div style="min-width:0;">
+            <div style="font-size:17px;font-weight:900;color:#1e1b4b;margin-bottom:3px;">${sess.title}</div>
+            <div style="font-size:12px;color:#9ca3af;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${sess.kanjiList||""}</div>
+            <div style="font-size:11px;color:#d4b896;margin-top:2px;">${total}問　全4レベル</div>
+          </div>
+        </div>
+        <button class="del" style="background:none;border:none;cursor:pointer;color:#d1d5db;font-size:20px;padding:6px 8px;border-radius:8px;flex-shrink:0;">🗑</button>`;
+      row.querySelector(".del").onclick = e => {
+        e.stopPropagation();
+        var delBtn = row.querySelector(".del");
+        if (delBtn.dataset.confirm === "1") {
+          S.sessions = S.sessions.filter(s=>s.id!==sess.id);
+          save(S.sessions); render();
+        } else {
+          delBtn.dataset.confirm = "1";
+          delBtn.textContent = "削除する";
+          delBtn.style.cssText += "background:#fee2e2;color:#dc2626;font-size:13px;font-weight:800;border-radius:8px;padding:6px 8px;border:1.5px solid #dc2626;";
+          setTimeout(() => { if (delBtn.dataset.confirm) { delBtn.dataset.confirm=""; delBtn.textContent="🗑"; delBtn.style.background=""; delBtn.style.color="#d1d5db"; delBtn.style.border="none"; delBtn.style.fontSize="20px"; } }, 3000);
+        }
+      };
+      row.onclick = e => { if(e.target.classList.contains("del")) return; S.active=sess; S.screen="kanji"; render(); };
+      div.appendChild(row);
+    });
+  }
+
+  var addBtn = el("button","btn-red");
+  addBtn.innerHTML = `<span style="font-size:22px;">＋</span> 新しい回を追加（JSONファイル）`;
+  addBtn.style.display = "none";
+  addBtn.onclick = () => go("add");
+  div.appendChild(addBtn);
+
+  app.appendChild(div);
+}
+
+function pageAdd() {
+  var div = el("div","slide-up");
+  var h2 = el("div");
+  h2.style.cssText = "font-size:18px;font-weight:900;color:#c1121f;margin-bottom:20px;";
+  h2.textContent = "＋ 新しい回を追加";
+  div.appendChild(h2);
+  var info = el("div","card");
+  info.style.marginBottom = "20px";
+  info.innerHTML = `
+    <div style="font-size:14px;font-weight:800;color:#92400e;margin-bottom:10px;">📋 使い方</div>
+    <div style="font-size:13px;color:#374151;line-height:1.9;">
+      このチャットで生成した<br>
+      <b>「data-第〇回.json」</b>ファイルを選んでください。<br><br>
+      <span style="color:#9ca3af;">iCloudドライブやAirDropで<br>iPadに転送したJSONファイルを選択できます。</span>
+    </div>`;
+  div.appendChild(info);
+  var zone = el("div");
+  zone.style.cssText = `border:3px dashed #f0e6d3;border-radius:20px;padding:44px 24px;
+    text-align:center;cursor:pointer;background:#fffef9;margin-bottom:14px;
+    transition:border-color 0.2s,background 0.2s;`;
+  zone.innerHTML = `
+    <div style="font-size:48px;margin-bottom:12px;">📂</div>
+    <div style="font-size:17px;font-weight:800;color:#1e1e1e;margin-bottom:6px;">JSONファイルを選ぶ</div>
+    <div style="font-size:13px;color:#9ca3af;">タップしてファイルを選択</div>`;
+  var fileInput = document.createElement("input");
+  fileInput.type="file"; fileInput.accept=".json,application/json"; fileInput.style.display="none";
+  fileInput.onchange = e => handleJSON(e.target.files[0]);
+  div.appendChild(fileInput);
+  zone.onmouseenter = () => { zone.style.borderColor="#c1121f"; zone.style.background="#fff8f0"; };
+  zone.onmouseleave = () => { zone.style.borderColor="#f0e6d3"; zone.style.background="#fffef9"; };
+  zone.onclick = () => fileInput.click();
+  zone.ondragover = e => { e.preventDefault(); zone.style.borderColor="#c1121f"; };
+  zone.ondragleave = () => zone.style.borderColor="#f0e6d3";
+  zone.ondrop = e => { e.preventDefault(); handleJSON(e.dataTransfer.files[0]); };
+  div.appendChild(zone);
+  var cancelBtn = el("button","btn-ghost");
+  cancelBtn.textContent = "← もどる";
+  cancelBtn.onclick = () => go("home");
+  div.appendChild(cancelBtn);
+
+  function handleJSON(file) {
+    if (!file) return;
+    var reader = new FileReader();
+    reader.onload = () => {
+      try {
+        var data = JSON.parse(reader.result);
+        if (!data.title || !data.levels || !Array.isArray(data.levels)) throw new Error("形式が正しくありません");
+        if (!data.id) data.id = Date.now();
+        var exists = S.sessions.find(s => s.id === data.id || s.title === data.title);
+        if (exists) {
+          zone.innerHTML = `<div style="text-align:center;padding:10px;">
+            <div style="font-size:16px;font-weight:800;margin-bottom:12px;">「${data.title}」は既に保存されています。</div>
+            <div style="display:flex;gap:10px;justify-content:center;">
+              <button id="overwrite-yes" style="padding:10px 22px;border-radius:12px;border:none;background:#c1121f;color:white;font-weight:800;font-size:14px;cursor:pointer;font-family:inherit;">上書きする</button>
+              <button id="overwrite-no" style="padding:10px 22px;border-radius:12px;border:1.5px solid #d1d5db;background:white;color:#374151;font-weight:700;font-size:14px;cursor:pointer;font-family:inherit;">キャンセル</button>
+            </div></div>`;
+          document.getElementById('overwrite-yes').onclick = () => { S.sessions = S.sessions.filter(s => s.id !== exists.id); S.sessions = [data, ...S.sessions]; save(S.sessions); finishImport(data); };
+          document.getElementById('overwrite-no').onclick = () => { S.screen='home'; render(); };
+          return;
+        }
+        S.sessions = [data, ...S.sessions];
+        save(S.sessions);
+        finishImport(data);
+      } catch(e) {
+        zone.innerHTML = `<div style="color:#dc2626;text-align:center;"><div style="font-size:32px;margin-bottom:10px;">❌</div><div style="font-size:14px;font-weight:800;">${e.message}</div></div>`;
+        zone.style.borderColor = "#dc2626";
+      }
+    };
+    reader.readAsText(file);
+  }
+  function finishImport(data) {
+    zone.innerHTML = `<div class="pop-in" style="color:#16a34a;text-align:center;"><div style="font-size:42px;margin-bottom:10px;">✅</div><div style="font-size:16px;font-weight:900;margin-bottom:4px;">「${data.title}」を追加しました！</div><div style="font-size:13px;color:#166534;">${data.kanjiList||""}</div></div>`;
+    zone.style.borderColor = "#16a34a"; zone.style.background = "#f0fdf4";
+    setTimeout(() => { S.active=data; S.screen="kanji"; render(); }, 1200);
+  }
+  app.appendChild(div);
+}
+
+var LC = [
+  { id:1, title:"レベル1 ⭐",      label:"やさしい",          color:"#22c55e", emoji:"🌱" },
+  { id:2, title:"レベル2 ⭐⭐",    label:"ふつう",            color:"#3b82f6", emoji:"📘" },
+  { id:3, title:"レベル3 ⭐⭐⭐",  label:"すこしむずかしい",  color:"#f59e0b", emoji:"🔥" },
+  { id:4, title:"レベル4 ⭐⭐⭐⭐", label:"チャレンジ！",      color:"#c1121f", emoji:"🏆" },
+];
+
+function pageDrill() {
+  var sess = S.active;
+  var div = el("div","slide-up");
+  var info = el("div");
+  info.style.cssText = `background:linear-gradient(135deg,#fff8f0,#fef3e2);border:2px solid #f0e6d3;border-radius:18px;padding:18px 20px;margin-bottom:20px;text-align:center;`;
+  info.innerHTML = `
+    <div style="font-size:13px;color:#92400e;font-weight:700;margin-bottom:6px;letter-spacing:1px;">${sess.title} れんしゅうかんじ</div>
+    <div style="font-size:19px;font-weight:900;color:#1e1e1e;letter-spacing:3px;line-height:1.9;">${sess.kanjiList||""}</div>
+    <div style="font-size:12px;color:#9ca3af;margin-top:6px;">レベルをえらんでちょうせんしよう！</div>`;
+  div.appendChild(info);
+
+  LC.forEach(lc => {
+    var qs = (sess.levels && sess.levels[lc.id-1] && sess.levels[lc.id-1].questions) || [];
+    var cleared = isClear(sess.title, lc.title);
+    var btn = el("button","level-btn");
+    btn.style.border = `2.5px solid ${cleared ? "#16a34a" : lc.color+"33"}`;
+    if (cleared) btn.style.background = "linear-gradient(135deg,#f0fdf4,#dcfce7)";
+    btn.innerHTML = `
+      <div style="display:flex;align-items:center;gap:14px;">
+        <div style="width:48px;height:48px;border-radius:14px;background:${cleared ? "#16a34a22" : lc.color+"20"};border:2px solid ${cleared ? "#16a34a55" : lc.color+"55"};display:flex;align-items:center;justify-content:center;font-size:24px;">${cleared ? "⭐" : lc.emoji}</div>
+        <div style="text-align:left;">
+          <div style="font-size:16px;font-weight:900;color:#1e1b4b;margin-bottom:2px;">${lc.title}</div>
+          <div style="font-size:12px;color:${cleared ? "#16a34a" : lc.color};font-weight:700;">${lc.label}　${qs.length}もん${cleared ? "　✅ クリア済" : ""}</div>
+        </div>
+      </div>
+      <div style="font-size:13px;font-weight:800;color:${cleared ? "#16a34a" : lc.color};background:${cleared ? "#16a34a15" : lc.color+"15"};border-radius:10px;padding:6px 12px;">${cleared ? "もう一度 →" : "スタート →"}</div>`;
+    btn.onmouseenter = () => { btn.style.transform="translateY(-2px)"; btn.style.boxShadow=`0 6px 20px ${lc.color}22`; };
+    btn.onmouseleave = () => { btn.style.transform=""; btn.style.boxShadow="0 2px 12px rgba(0,0,0,0.06)"; };
+    btn.onclick = () => { S.level = lc.id; S.ps = makePracticeState(qs); S.screen = "practice"; render(); };
+    div.appendChild(btn);
+  });
+
+  var allQs = (sess.levels ? sess.levels.reduce(function(a,l){return a.concat(l.questions);}, []) : []);
+  var sumBtn = el("button");
+  sumBtn.style.cssText = `width:100%;background:linear-gradient(135deg,#1e1b4b,#312e81);border:none;border-radius:18px;padding:18px 20px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;box-shadow:0 4px 20px rgba(30,27,75,0.3);font-family:inherit;`;
+  sumBtn.innerHTML = `
+    <div style="display:flex;align-items:center;gap:14px;">
+      <div style="width:48px;height:48px;border-radius:14px;background:rgba(255,255,255,0.15);display:flex;align-items:center;justify-content:center;font-size:24px;">🏆</div>
+      <div style="text-align:left;">
+        <div style="font-size:16px;font-weight:900;color:white;margin-bottom:2px;">まとめテスト</div>
+        <div style="font-size:12px;color:#a5b4fc;font-weight:700;">全レベルからランダム 10もん</div>
+      </div>
+    </div>
+    <div style="font-size:13px;font-weight:800;color:white;background:rgba(255,255,255,0.15);border-radius:10px;padding:6px 12px;">チャレンジ →</div>`;
+  sumBtn.onclick = () => {
+    var shuffled = allQs.slice().sort(function(){ return Math.random()-0.5; });
+    var picked = shuffled.slice(0, 10);
+    S.level = "summary"; S.ps = makePracticeState(picked); S.screen = "practice"; render();
+  };
+  div.appendChild(sumBtn);
+  app.appendChild(div);
+}
+
+function makePracticeState(questions) {
+  return { questions, verdicts: {}, done: false };
+}
+
+function pagePractice() {
+  var ps = S.ps;
+  var lc = S.level !== "summary" ? LC[S.level-1] : null;
+  var title = lc ? `${lc.emoji} ${lc.title}` : "🏆 まとめテスト（全レベル）";
+  var div = el("div","slide-up");
+  var bar = el("div");
+  bar.style.cssText = "display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;";
+  var h2 = el("div"); h2.style.cssText = "font-size:17px;color:#c1121f;font-weight:900;"; h2.textContent = title;
+  var badge = el("span"); badge.id="pbadge";
+  badge.style.cssText = "background:#f0e6d3;border-radius:20px;padding:4px 12px;font-size:12px;color:#92400e;font-weight:700;";
+  badge.textContent = `0/${ps.questions.length} 採点済`;
+  bar.appendChild(h2); bar.appendChild(badge);
+  div.appendChild(bar);
+
+  if (!ps.done) {
+    ps.questions.forEach((q,qi) => div.appendChild(buildQCard(q,qi,ps)));
+    var wrap = el("div"); wrap.id="res-wrap";
+    div.appendChild(wrap);
+    updateResWrap(ps);
+  } else {
+    ps.questions.forEach((q,qi) => {
+      var {before,kana,after} = parseSen(q.sentence);
+      var v = ps.verdicts[qi];
+      var row = el("div");
+      row.style.cssText = `background:white;border-radius:14px;padding:14px 18px;margin-bottom:10px;border:2px solid ${v==="correct"?"#16a34a":"#dc2626"};display:flex;align-items:center;justify-content:space-between;box-shadow:0 1px 8px rgba(0,0,0,0.06);`;
+      row.innerHTML = `<div><div style="font-size:12px;color:#9ca3af;margin-bottom:2px;">第${qi+1}問</div><div style="font-size:16px;color:#1e1e1e;font-weight:500;">${before}<span style="color:#c1121f;font-weight:800;">${kana}</span>${after}</div><div style="font-size:13px;color:#78716c;margin-top:2px;">こたえ：<b>${q.answer}</b></div></div><div style="font-size:28px;">${v==="correct"?"⭕":"✕"}</div>`;
+      div.appendChild(row);
+    });
+
+    var correct = Object.values(ps.verdicts).filter(v=>v==="correct").length;
+    var total   = ps.questions.length;
+    var msg = correct===total ? "🌟 かんぺき！すごい！" : correct>=total*0.7 ? "⭐ よくできました！" : correct>=total*0.4 ? "💪 もう少し！がんばれ！" : "📖 また れんしゅう しよう！";
+    var isClearedNow = S.level !== "summary" && correct === total;
+    var allLevelsCleared = (function() {
+      if (S.level === "summary") return false;
+      var sess = S.active;
+      if (!sess) return false;
+      var cleared = true;
+      LC.forEach(function(lc) {
+        if (!isClear(sess.title, lc.title)) cleared = false;
+      });
+      return cleared;
+    })();
+    var lc2 = S.level !== "summary" ? LC[S.level-1] : null;
+
+    var banner = el("div","result-banner pop-in"); banner.style.marginTop="8px";
+    banner.innerHTML = `
+      <div style="color:#a5b4fc;font-size:13px;letter-spacing:2px;margin-bottom:8px;">さいてん けっか</div>
+      <div style="color:white;font-size:50px;font-weight:900;line-height:1;">${correct}<span style="font-size:20px;color:#a5b4fc;font-weight:400;"> / ${total}もん</span></div>
+      <div style="font-size:24px;margin-top:12px;">${msg}</div>
+      ${isClearedNow ? `<div style="margin-top:16px;background:rgba(255,255,255,0.15);border-radius:14px;padding:14px 20px;"><div style="font-size:28px;margin-bottom:4px;">🎉</div><div style="font-size:22px;font-weight:900;color:#fde68a;letter-spacing:2px;">レベルクリア！</div><div style="font-size:13px;color:#a5b4fc;margin-top:4px;">${lc2 ? lc2.title : ""} をクリアしました</div></div>` : ""}
+      ${allLevelsCleared ? `<div style="margin-top:16px;background:linear-gradient(135deg,#fde68a,#fbbf24);border-radius:18px;padding:20px;text-align:center;"><div style="font-size:48px;margin-bottom:8px;">🏆</div><div style="font-size:26px;font-weight:900;color:#92400e;letter-spacing:2px;">ぜんぶクリア！！</div><div style="font-size:15px;color:#78350f;margin-top:6px;font-weight:700;">すべてのレベルをせいふくしたよ！</div></div>` : ""}`;
+    div.appendChild(banner);
+    if (allLevelsCleared) { setTimeout(launchFireworks, 300); }
+
+    var resetBtn = el("button","btn-ghost"); resetBtn.style.marginTop="10px"; resetBtn.textContent = "🔄 もう一度やる";
+    resetBtn.onclick = () => { S.ps = makePracticeState(ps.questions); render(); };
+    div.appendChild(resetBtn);
+  }
+
+  app.innerHTML = ""; app.appendChild(div);
+}
+
+function updateResWrap(ps) {
+  var wrap = document.getElementById("res-wrap"); if (!wrap) return;
+  var badge = document.getElementById("pbadge");
+  var g = Object.keys(ps.verdicts).length;
+  if (badge) badge.textContent = `${g}/${ps.questions.length} 採点済`;
+  wrap.innerHTML = "";
+  if (g === ps.questions.length) {
+    var btn = el("button","btn-red"); btn.style.marginTop="4px"; btn.innerHTML = "🏆 けっか を みる";
+    btn.onclick = () => {
+      ps.done = true;
+      var correct = Object.values(ps.verdicts).filter(v=>v==="correct").length;
+      var wrongs = ps.questions.filter((_,qi) => ps.verdicts[qi]==="wrong").map(q => ({ sentence: q.sentence, answer: q.answer }));
+      var lc = S.level !== "summary" ? LC[S.level-1] : null;
+      addHistory({ date: new Date().toISOString(), sessionTitle: (S.active ? S.active.title : ""), levelTitle: lc ? lc.title : "まとめテスト", total: ps.questions.length, correct, wrongs });
+      pagePractice();
+    };
+    wrap.appendChild(btn);
+  }
+}
+
+function pageHistory() {
+  var history = loadHistory();
+  var div = el("div","slide-up");
+  var h2 = el("div"); h2.style.cssText = "font-size:18px;font-weight:900;color:#c1121f;margin-bottom:20px;"; h2.textContent = "📊 取り組み履歴";
+  div.appendChild(h2);
+
+  if (history.length === 0) {
+    var empty = el("div"); empty.style.cssText = "text-align:center;padding:48px 20px;";
+    empty.innerHTML = `<div style="font-size:48px;margin-bottom:16px;">📭</div><div style="font-size:16px;font-weight:700;color:#9ca3af;">まだ履歴がありません</div><div style="font-size:13px;color:#d1d5db;margin-top:8px;">ドリルに取り組むと記録されます</div>`;
+    div.appendChild(empty); app.appendChild(div); return;
+  }
+
+  var allWrongs = {};
+  history.forEach(r => { if (r.wrongs) r.wrongs.forEach(function(w) { var k = w.answer; if (!allWrongs[k]) allWrongs[k] = 0; allWrongs[k]++; }); });
+  var wrongEntries = Object.entries(allWrongs).sort((a,b)=>b[1]-a[1]);
+
+  if (wrongEntries.length > 0) {
+    var wCard = el("div","card"); wCard.style.marginBottom = "20px";
+    wCard.innerHTML = `<div style="font-size:14px;font-weight:800;color:#dc2626;margin-bottom:12px;">❌ 苦手な漢字</div>`;
+    var wGrid = el("div"); wGrid.style.cssText = "display:flex;flex-wrap:wrap;gap:8px;";
+    wrongEntries.slice(0,20).forEach(([kanji, count]) => {
+      var chip = el("div");
+      chip.style.cssText = `background:#fff0f0;border:2px solid #fecaca;border-radius:10px;padding:6px 12px;display:flex;align-items:center;gap:6px;`;
+      chip.innerHTML = `<span style="font-size:18px;font-weight:900;color:#1e1e1e;">${kanji}</span><span style="font-size:11px;color:#dc2626;font-weight:700;">${count}回ミス</span>`;
+      wGrid.appendChild(chip);
+    });
+    wCard.appendChild(wGrid); div.appendChild(wCard);
+  }
+
+  var listLabel = el("div"); listLabel.style.cssText = "font-size:13px;color:#9ca3af;font-weight:600;margin-bottom:12px;letter-spacing:1px;"; listLabel.textContent = `取り組み記録（${history.length}件）`;
+  div.appendChild(listLabel);
+
+  history.forEach(r => {
+    var d = new Date(r.date);
+    var dateStr = `${d.getFullYear()}/${d.getMonth()+1}/${d.getDate()}`;
+    var timeStr = `${String(d.getHours()).padStart(2,"0")}:${String(d.getMinutes()).padStart(2,"0")}`;
+    var pct = Math.round(r.correct/r.total*100);
+    var color = pct===100?"#16a34a":pct>=70?"#3b82f6":pct>=40?"#f59e0b":"#dc2626";
+    var row = el("div");
+    row.style.cssText = `background:white;border:2px solid #f0e6d3;border-radius:16px;padding:14px 18px;margin-bottom:10px;box-shadow:0 1px 8px rgba(0,0,0,0.05);`;
+    row.innerHTML = `
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+        <div><span style="font-size:14px;font-weight:800;color:#1e1b4b;">${r.sessionTitle}</span><span style="font-size:12px;color:#9ca3af;margin-left:8px;">${r.levelTitle}</span></div>
+        <div style="font-size:22px;font-weight:900;color:${color};">${r.correct}<span style="font-size:13px;color:#9ca3af;font-weight:400;">/${r.total}</span></div>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;">
+        <div style="flex:1;height:6px;background:#f0e6d3;border-radius:3px;overflow:hidden;"><div style="width:${pct}%;height:100%;background:${color};border-radius:3px;transition:width 0.5s;"></div></div>
+        <div style="font-size:11px;color:#9ca3af;white-space:nowrap;">${dateStr} ${timeStr}</div>
+      </div>
+      ${r.wrongs && r.wrongs.length>0 ? `<div style="margin-top:8px;padding-top:8px;border-top:1px solid #f0e6d3;"><span style="font-size:11px;color:#dc2626;font-weight:700;">ミス：</span>${r.wrongs.map(w=>`<span style="font-size:13px;font-weight:800;color:#1e1e1e;margin-right:6px;">${w.answer}</span>`).join("")}</div>` : ""}`;
+    div.appendChild(row);
+  });
+
+  var clearWrap = el("div"); clearWrap.style.cssText = "margin-top:8px;";
+  var clearBtn = el("button","btn-ghost"); clearBtn.textContent = "🗑 履歴をすべて削除";
+  clearBtn.onclick = () => {
+    clearWrap.innerHTML = "";
+    var confirm_div = el("div");
+    confirm_div.style.cssText = `background:#fff0f0;border:2px solid #fecaca;border-radius:14px;padding:16px;text-align:center;`;
+    confirm_div.innerHTML = `<div style="font-size:14px;font-weight:700;color:#dc2626;margin-bottom:12px;">本当に全件削除しますか？</div>`;
+    var yesBtn = el("button"); yesBtn.textContent = "はい、削除する";
+    yesBtn.style.cssText = `background:#dc2626;color:white;border:none;border-radius:10px;padding:10px 20px;font-weight:800;font-size:14px;cursor:pointer;margin-right:8px;font-family:inherit;`;
+    yesBtn.onclick = () => { saveHistory([]); render(); };
+    var noBtn = el("button"); noBtn.textContent = "キャンセル";
+    noBtn.style.cssText = `background:white;color:#6b7280;border:2px solid #e5e7eb;border-radius:10px;padding:10px 20px;font-weight:700;font-size:14px;cursor:pointer;font-family:inherit;`;
+    noBtn.onclick = () => { clearWrap.innerHTML=""; clearWrap.appendChild(clearBtn); };
+    confirm_div.appendChild(yesBtn); confirm_div.appendChild(noBtn); clearWrap.appendChild(confirm_div);
+  };
+  clearWrap.appendChild(clearBtn); div.appendChild(clearWrap); app.appendChild(div);
+}
+
+function buildQCard(q, qi, ps) {
+  var {before,kana,after} = parseSen(q.sentence);
+  var chars = q.answer.split("");
+  var shown = !!ps.verdicts[qi];
+  var drawn = {};
+  var card = el("div","q-card");
+  if (ps.verdicts[qi]==="correct") card.classList.add("correct");
+  else if (ps.verdicts[qi]==="wrong") card.classList.add("wrong");
+
+  function rebuild() {
+    card.className = "q-card" + (ps.verdicts[qi]==="correct"?" correct":ps.verdicts[qi]==="wrong"?" wrong":shown?" shown":"");
+    card.innerHTML = "";
+    var top = el("div"); top.style.cssText = "display:flex;align-items:baseline;gap:8px;margin-bottom:12px;";
+    top.innerHTML = `<span style="font-size:11px;font-weight:800;color:white;background:#c1121f;border-radius:20px;padding:2px 9px;flex-shrink:0;">第${qi+1}問</span><div style="font-size:18px;color:#1e1e1e;line-height:1.9;font-weight:500;">${before}<span style="color:#c1121f;font-weight:800;background:#fff0f0;border-radius:5px;padding:1px 5px;margin:0 1px;">${kana}</span>${after}</div>`;
+    card.appendChild(top);
+    var row = el("div"); row.style.cssText = "display:flex;align-items:center;gap:14px;flex-wrap:wrap;";
+    var cellGroup = el("div"); cellGroup.style.cssText = "display:flex;gap:10px;flex-wrap:wrap;align-items:center;";
+    chars.forEach((_,ci) => {
+      var cell = makeCell(200, d => { drawn[ci]=d; }, ps.verdicts[qi]||null, !shown && !ps.verdicts[qi], drawn[ci]);
+      cellGroup.appendChild(cell);
+    });
+    row.appendChild(cellGroup);
+    var ctrl = el("div"); ctrl.style.cssText = "display:flex;flex-direction:column;gap:8px;align-items:stretch;min-width:80px;";
+    if (!shown) {
+      var ab = el("button"); ab.id=`ab${qi}`;
+      ab.style.cssText=`padding:12px 16px;border-radius:14px;border:none;background:linear-gradient(135deg,#c1121f,#780000);color:white;font-weight:800;font-size:14px;cursor:pointer;font-family:inherit;white-space:nowrap;`;
+      ab.textContent="📖 こたえをみる"; ab.onclick=()=>{ shown=true; rebuild(); };
+      ctrl.appendChild(ab);
+    } else {
+      var aw = el("div","pop-in"); aw.style.cssText = "display:flex;flex-direction:column;align-items:center;gap:4px;";
+      var ar = el("div"); ar.style.cssText="display:flex;gap:5px;flex-wrap:wrap;justify-content:center;";
+      chars.forEach(c => {
+        var b = el("div");
+        b.style.cssText=`width:44px;height:44px;border:2px solid #d4b896;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:900;background:#fffef5;`;
+        b.textContent=c; ar.appendChild(b);
+      });
+      var lbl=el("div"); lbl.style.cssText="font-size:10px;color:#92400e;font-weight:700;"; lbl.textContent="こたえ";
+      aw.appendChild(ar); aw.appendChild(lbl); ctrl.appendChild(aw);
+      if (!ps.verdicts[qi]) {
+        var btns=el("div","pop-in"); btns.style.cssText="display:flex;gap:6px;justify-content:center;";
+        var ok=el("button"); ok.textContent="⭕";
+        ok.style.cssText=`width:52px;height:52px;border-radius:14px;border:2.5px solid #16a34a;background:white;font-size:26px;cursor:pointer;display:flex;align-items:center;justify-content:center;`;
+        ok.onmouseenter=()=>ok.style.background="#dcfce7"; ok.onmouseleave=()=>ok.style.background="white";
+        ok.onclick=()=>{ ps.verdicts[qi]="correct"; updateResWrap(ps); shown=true; rebuild(); };
+        var ng=el("button"); ng.textContent="✕";
+        ng.style.cssText=`width:52px;height:52px;border-radius:14px;border:2.5px solid #dc2626;background:white;font-size:22px;font-weight:900;cursor:pointer;display:flex;align-items:center;justify-content:center;`;
+        ng.onmouseenter=()=>ng.style.background="#fee2e2"; ng.onmouseleave=()=>ng.style.background="white";
+        ng.onclick=()=>{ ps.verdicts[qi]="wrong"; updateResWrap(ps); shown=true; rebuild(); };
+        btns.appendChild(ok); btns.appendChild(ng); ctrl.appendChild(btns);
+      }
+      if (ps.verdicts[qi]) {
+        var u=el("button"); u.textContent="やり直し";
+        u.style.cssText=`padding:8px 10px;border-radius:10px;border:1.5px solid #d1d5db;background:white;color:#6b7280;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;text-align:center;`;
+        u.onclick=()=>{ delete ps.verdicts[qi]; shown=false; updateResWrap(ps); rebuild(); };
+        ctrl.appendChild(u);
+      }
+    }
+    row.appendChild(ctrl); card.appendChild(row);
+  }
+  rebuild(); return card;
+}
+
+function makeCell(size, onDraw, verdict, allowClear, restoreData) {
+  var wrap=document.createElement("div");
+  wrap.style.cssText=`position:relative;width:${size}px;height:${size}px;display:inline-block;`;
+  var cv=document.createElement("canvas"); cv.width=size*2; cv.height=size*2;
+  var bc=verdict==="correct"?"#16a34a":verdict==="wrong"?"#dc2626":"#d4b896";
+  cv.style.cssText=`position:absolute;inset:0;width:${size}px;height:${size}px;border:2.5px solid ${bc};border-radius:10px;cursor:crosshair;touch-action:none;box-shadow:0 2px 8px rgba(0,0,0,0.08);`;
+  var ov=document.createElement("canvas"); ov.width=size*2; ov.height=size*2;
+  ov.style.cssText=`position:absolute;inset:0;width:${size}px;height:${size}px;border-radius:10px;pointer-events:none;`;
+  var ctx=cv.getContext("2d"), oct=ov.getContext("2d");
+  function grid(){
+    var s=size*2;
+    ctx.fillStyle="#fffef9"; ctx.fillRect(0,0,s,s);
+    ctx.strokeStyle="#ddc9a8"; ctx.lineWidth=1; ctx.setLineDash([5,5]);
+    ctx.beginPath(); ctx.moveTo(s/2,0); ctx.lineTo(s/2,s); ctx.moveTo(0,s/2); ctx.lineTo(s,s/2); ctx.stroke();
+    ctx.setLineDash([]);
+  }
+  grid();
+  if (restoreData) { var img = new Image(); img.onload = () => ctx.drawImage(img, 0, 0, cv.width, cv.height); img.src = restoreData; }
+  if (verdict) {
+    var s=size*2;
+    if (verdict==="correct") {
+      oct.fillStyle="rgba(22,163,74,0.12)"; oct.fillRect(0,0,s,s);
+      oct.strokeStyle="rgba(22,163,74,0.92)"; oct.lineWidth=18; oct.lineCap="round";
+      oct.beginPath(); oct.arc(s/2,s/2,s*0.38,0,Math.PI*2); oct.stroke();
+    } else {
+      oct.fillStyle="rgba(220,38,38,0.10)"; oct.fillRect(0,0,s,s);
+      oct.strokeStyle="rgba(220,38,38,0.92)"; oct.lineWidth=18; oct.lineCap="round";
+      var m=s*0.18;
+      oct.beginPath(); oct.moveTo(m,m); oct.lineTo(s-m,s-m); oct.moveTo(s-m,m); oct.lineTo(m,s-m); oct.stroke();
+    }
+  }
+  var draw=false, last=null, hasDrawn=false;
+  function pos(e){
+    var r=cv.getBoundingClientRect(), sx=cv.width/r.width, sy=cv.height/r.height;
+    var s=e.touches?e.touches[0]:e;
+    return {x:(s.clientX-r.left)*sx, y:(s.clientY-r.top)*sy};
+  }
+  cv.addEventListener("mousedown",   e=>{draw=true;last=pos(e);hasDrawn=true;});
+  cv.addEventListener("mousemove",   e=>{if(!draw)return;var p=pos(e);stroke(p);last=p;});
+  cv.addEventListener("mouseup",     ()=>{draw=false;if(hasDrawn&&onDraw)onDraw(cv.toDataURL());});
+  cv.addEventListener("mouseleave",  ()=>{draw=false;});
+  cv.addEventListener("touchstart",  e=>{e.preventDefault();draw=true;last=pos(e);hasDrawn=true;},{passive:false});
+  cv.addEventListener("touchmove",   e=>{e.preventDefault();if(!draw)return;var p=pos(e);var f=e.touches[0].force||0;stroke(p,f);last=p;},{passive:false});
+  cv.addEventListener("touchend",    e=>{e.preventDefault();draw=false;if(hasDrawn&&onDraw)onDraw(cv.toDataURL());},{passive:false});
+  function stroke(p, force){
+    var f = (force && force > 0) ? force : 0.5;
+    var w = Math.max(8, f * 24 + 6);
+    ctx.strokeStyle="#1c1c2e"; ctx.lineWidth=w;
+    ctx.lineCap="round"; ctx.lineJoin="round";
+    ctx.beginPath(); ctx.moveTo(last.x,last.y); ctx.lineTo(p.x,p.y); ctx.stroke();
+  }
+  if (allowClear) {
+    var cb=document.createElement("button"); cb.textContent="✕";
+    cb.style.cssText=`position:absolute;top:-9px;right:-9px;width:22px;height:22px;border-radius:50%;border:none;background:#94a3b8;color:white;font-size:11px;cursor:pointer;padding:0;display:flex;align-items:center;justify-content:center;`;
+    cb.onclick=e=>{ e.stopPropagation(); ctx.clearRect(0,0,cv.width,cv.height); grid(); oct.clearRect(0,0,ov.width,ov.height); hasDrawn=false; if(onDraw) onDraw(null); };
+    wrap.appendChild(cb);
+  }
+  wrap.appendChild(cv); wrap.appendChild(ov);
+  return wrap;
+}
+
+function el(tag, cls) {
+  var e=document.createElement(tag||"div");
+  if(cls) e.className=cls;
+  return e;
+}
+function parseSen(s){
+  var m=s.match(/^(.*?)\{([^}]+)\}(.*)$/);
+  return m?{before:m[1],kana:m[2],after:m[3]}:{before:s,kana:"",after:""};
+}
+
+render();
+
+function launchFireworks() {
+  var canvas = document.createElement("canvas");
+  canvas.style.cssText = "position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:9999;";
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  document.body.appendChild(canvas);
+  var ctx = canvas.getContext("2d");
+  var particles = [];
+  var colors = ["#fde68a","#fb923c","#f87171","#a78bfa","#34d399","#60a5fa","#f472b6"];
+  for (var b = 0; b < 8; b++) {
+    var bx = Math.random() * canvas.width;
+    var by = Math.random() * canvas.height * 0.6;
+    for (var p = 0; p < 40; p++) {
+      var angle = (p / 40) * Math.PI * 2;
+      var speed = 2 + Math.random() * 4;
+      particles.push({
+        x: bx, y: by,
+        vx: Math.cos(angle) * speed,
+        vy: Math.sin(angle) * speed,
+        alpha: 1,
+        color: colors[Math.floor(Math.random() * colors.length)],
+        r: 3 + Math.random() * 3
+      });
+    }
+  }
+  var frame = 0;
+  function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    particles.forEach(function(p) {
+      p.x += p.vx; p.y += p.vy; p.vy += 0.08; p.alpha -= 0.018;
+      ctx.globalAlpha = Math.max(0, p.alpha);
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r, 0, Math.PI*2);
+      ctx.fillStyle = p.color;
+      ctx.fill();
+    });
+    frame++;
+    if (frame < 80) requestAnimationFrame(draw);
+    else { canvas.remove(); }
+  }
+  draw();
+}
+
+</script>
+</body>
+</html>
