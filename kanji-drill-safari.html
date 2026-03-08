@@ -138,99 +138,545 @@ var BUILTIN = [
       {
         "level": 1,
         "questions": [
-          {"sentence": "もみじを{オリモノ}に染める。", "answer": "織物"},
-          {"sentence": "{ショクギョウ}選択の自由。", "answer": "職業"},
-          {"sentence": "教育{セイド}を見直す。", "answer": "制度"},
-          {"sentence": "{ヒンセイ}いやしからぬ人。", "answer": "品性"},
-          {"sentence": "国民のための{セイジ}。", "answer": "政治"},
-          {"sentence": "強い{セイリョク}の台風。", "answer": "勢力"},
-          {"sentence": "{セイマイ}したてのお米。", "answer": "精米"},
-          {"sentence": "家具を{セイサク}する。", "answer": "製作"},
-          {"sentence": "国に{ゼイキン}を納める。", "answer": "税金"},
-          {"sentence": "{セキニン}感が強い人だ。", "answer": "責任"}
+          {
+            "sentence": "もみじを{オリモノ}に染める。",
+            "answer": "織物"
+          },
+          {
+            "sentence": "{ショクギョウ}選択の自由。",
+            "answer": "職業"
+          },
+          {
+            "sentence": "教育{セイド}を見直す。",
+            "answer": "制度"
+          },
+          {
+            "sentence": "{ヒンセイ}いやしからぬ人。",
+            "answer": "品性"
+          },
+          {
+            "sentence": "国民のための{セイジ}。",
+            "answer": "政治"
+          },
+          {
+            "sentence": "強い{セイリョク}の台風。",
+            "answer": "勢力"
+          },
+          {
+            "sentence": "{セイマイ}したてのお米。",
+            "answer": "精米"
+          },
+          {
+            "sentence": "家具を{セイサク}する。",
+            "answer": "製作"
+          },
+          {
+            "sentence": "国に{ゼイキン}を納める。",
+            "answer": "税金"
+          },
+          {
+            "sentence": "{セキニン}感が強い人だ。",
+            "answer": "責任"
+          }
         ]
       },
       {
         "level": 2,
         "questions": [
-          {"sentence": "物を{ソシキ}する。", "answer": "組織"},
-          {"sentence": "{ショクム}を果たす。", "answer": "職務"},
-          {"sentence": "法律が{セイテイ}される。", "answer": "制定"},
-          {"sentence": "{セイサン}性を高める。", "answer": "生産"},
-          {"sentence": "国の{ザイセイ}を立て直す。", "answer": "財政"},
-          {"sentence": "国際{ジョウセイ}を調べる。", "answer": "情勢"},
-          {"sentence": "海外事情に{セイツウ}する。", "answer": "精通"},
-          {"sentence": "原料から物を{セイゾウ}する。", "answer": "製造"},
-          {"sentence": "{ゼイリツ}を引き下げる。", "answer": "税率"},
-          {"sentence": "首相の失政を{せ}める。", "answer": "責"}
+          {
+            "sentence": "物を{ソシキ}する。",
+            "answer": "組織"
+          },
+          {
+            "sentence": "{ショクム}を果たす。",
+            "answer": "職務"
+          },
+          {
+            "sentence": "法律が{セイテイ}される。",
+            "answer": "制定"
+          },
+          {
+            "sentence": "{セイサン}性を高める。",
+            "answer": "生産"
+          },
+          {
+            "sentence": "国の{ザイセイ}を立て直す。",
+            "answer": "財政"
+          },
+          {
+            "sentence": "国際{ジョウセイ}を調べる。",
+            "answer": "情勢"
+          },
+          {
+            "sentence": "海外事情に{セイツウ}する。",
+            "answer": "精通"
+          },
+          {
+            "sentence": "原料から物を{セイゾウ}する。",
+            "answer": "製造"
+          },
+          {
+            "sentence": "{ゼイリツ}を引き下げる。",
+            "answer": "税率"
+          },
+          {
+            "sentence": "首相の失政を{せ}める。",
+            "answer": "責"
+          }
         ]
       },
       {
         "level": 3,
         "questions": [
-          {"sentence": "労働組合を{ソシキ}する。", "answer": "組織"},
-          {"sentence": "働きやすい{ショクバ}の技に見入る。", "answer": "職場"},
-          {"sentence": "{セイゲン}速度を守る。", "answer": "制限"},
-          {"sentence": "氏名と{セイベツ}を記す。", "answer": "性別"},
-          {"sentence": "{コクセイ}選挙が行われる。", "answer": "国政"},
-          {"sentence": "強い{ジョウリョク}の台風。", "answer": "情勢"},
-          {"sentence": "{セイシン}状態が安定する。", "answer": "精神"},
-          {"sentence": "{ジカセイ}の味噌を食べる。", "answer": "自家製"},
-          {"sentence": "国民が{ゲンゼイ}を願う。", "answer": "減税"},
-          {"sentence": "{ジセキ}の念にかられる。", "answer": "自責"}
+          {
+            "sentence": "労働組合を{ソシキ}する。",
+            "answer": "組織"
+          },
+          {
+            "sentence": "働きやすい{ショクバ}の技に見入る。",
+            "answer": "職場"
+          },
+          {
+            "sentence": "{セイゲン}速度を守る。",
+            "answer": "制限"
+          },
+          {
+            "sentence": "氏名と{セイベツ}を記す。",
+            "answer": "性別"
+          },
+          {
+            "sentence": "{コクセイ}選挙が行われる。",
+            "answer": "国政"
+          },
+          {
+            "sentence": "強い{ジョウリョク}の台風。",
+            "answer": "情勢"
+          },
+          {
+            "sentence": "{セイシン}状態が安定する。",
+            "answer": "精神"
+          },
+          {
+            "sentence": "{ジカセイ}の味噌を食べる。",
+            "answer": "自家製"
+          },
+          {
+            "sentence": "国民が{ゲンゼイ}を願う。",
+            "answer": "減税"
+          },
+          {
+            "sentence": "{ジセキ}の念にかられる。",
+            "answer": "自責"
+          }
         ]
       },
       {
         "level": 4,
         "questions": [
-          {"sentence": "自動{ショッキ}を発明した人物。", "answer": "織機"},
-          {"sentence": "働きやすい{ショクニン}の技に見入る。", "answer": "職人"},
-          {"sentence": "絵の{セイサク}にいそしむ。", "answer": "制作"},
-          {"sentence": "困難に負けない{コンジョウ}。", "answer": "根性"},
-          {"sentence": "首相が{セイフ}を率いる。", "answer": "政府"},
-          {"sentence": "おおぜいの{いきお}いがさかんな若い人々が集まる。", "answer": "勢"},
-          {"sentence": "芸の道に{ショウジン}する。", "answer": "精進"},
-          {"sentence": "かんづめの{セイヒン}を出荷する。", "answer": "製品"},
-          {"sentence": "輸入品に{カゼイ}する。", "answer": "課税"},
-          {"sentence": "社長の{ジュウセキ}を担う。", "answer": "重責"}
+          {
+            "sentence": "自動{ショッキ}を発明した人物。",
+            "answer": "織機"
+          },
+          {
+            "sentence": "働きやすい{ショクニン}の技に見入る。",
+            "answer": "職人"
+          },
+          {
+            "sentence": "絵の{セイサク}にいそしむ。",
+            "answer": "制作"
+          },
+          {
+            "sentence": "困難に負けない{コンジョウ}。",
+            "answer": "根性"
+          },
+          {
+            "sentence": "首相が{セイフ}を率いる。",
+            "answer": "政府"
+          },
+          {
+            "sentence": "おおぜいの{いきお}いがさかんな若い人々が集まる。",
+            "answer": "勢"
+          },
+          {
+            "sentence": "芸の道に{ショウジン}する。",
+            "answer": "精進"
+          },
+          {
+            "sentence": "かんづめの{セイヒン}を出荷する。",
+            "answer": "製品"
+          },
+          {
+            "sentence": "輸入品に{カゼイ}する。",
+            "answer": "課税"
+          },
+          {
+            "sentence": "社長の{ジュウセキ}を担う。",
+            "answer": "重責"
+          }
         ]
       }
     ],
     "kanjiData": [
-      {"kanji": "織", "readings": [
-        {"type": "音読み", "reading": "シキ・（ショク）", "example": "労働組合を組織する。", "exampleKanji": [{"kanji": "組織", "reading": "そしき"}]},
-        {"type": "訓読み", "reading": "お（る）", "example": "布を織る機械。", "exampleKanji": []}
-      ], "jukugo": [{"word": "組織", "reading": "そしき"}, {"word": "織物", "reading": "おりもの"}, {"word": "染織", "reading": "せんしょく"}]},
-      {"kanji": "職", "readings": [
-        {"type": "音読み", "reading": "ショク", "example": "働きやすい職場に見入る。", "exampleKanji": [{"kanji": "職場", "reading": "しょくば"}]}
-      ], "jukugo": [{"word": "職業", "reading": "しょくぎょう"}, {"word": "職場", "reading": "しょくば"}, {"word": "職務", "reading": "しょくむ"}, {"word": "職人", "reading": "しょくにん"}]},
-      {"kanji": "制", "readings": [
-        {"type": "音読み", "reading": "セイ", "example": "教育制度を見直す。", "exampleKanji": [{"kanji": "制度", "reading": "せいど"}]}
-      ], "jukugo": [{"word": "制度", "reading": "せいど"}, {"word": "制限", "reading": "せいげん"}, {"word": "制作", "reading": "せいさく"}, {"word": "節制", "reading": "せっせい"}]},
-      {"kanji": "性", "readings": [
-        {"type": "音読み", "reading": "セイ・（ショウ）", "example": "氏名と性別を記す。", "exampleKanji": [{"kanji": "性別", "reading": "せいべつ"}]}
-      ], "jukugo": [{"word": "性別", "reading": "せいべつ"}, {"word": "品性", "reading": "ひんせい"}, {"word": "人間性", "reading": "にんげんせい"}, {"word": "根性", "reading": "こんじょう"}]},
-      {"kanji": "政", "readings": [
-        {"type": "音読み", "reading": "セイ・（ショウ）", "example": "首相が政府を率いる。", "exampleKanji": [{"kanji": "政府", "reading": "せいふ"}]},
-        {"type": "訓読み", "reading": "まつりごと", "example": "国を治める政。", "exampleKanji": []}
-      ], "jukugo": [{"word": "政治", "reading": "せいじ"}, {"word": "政府", "reading": "せいふ"}, {"word": "行政", "reading": "ぎょうせい"}, {"word": "財政", "reading": "ざいせい"}]},
-      {"kanji": "勢", "readings": [
-        {"type": "音読み", "reading": "セイ", "example": "強い勢力の台風。", "exampleKanji": [{"kanji": "勢力", "reading": "せいりょく"}]},
-        {"type": "訓読み", "reading": "いきおい", "example": "台風の勢いが強い。", "exampleKanji": []}
-      ], "jukugo": [{"word": "勢力", "reading": "せいりょく"}, {"word": "大勢", "reading": "おおぜい"}, {"word": "姿勢", "reading": "しせい"}, {"word": "軍勢", "reading": "ぐんぜい"}]},
-      {"kanji": "精", "readings": [
-        {"type": "音読み", "reading": "セイ・（ショウ）", "example": "芸の道に精進する。", "exampleKanji": [{"kanji": "精進", "reading": "しょうじん"}]}
-      ], "jukugo": [{"word": "精神", "reading": "せいしん"}, {"word": "精米", "reading": "せいまい"}, {"word": "精通", "reading": "せいつう"}, {"word": "不精", "reading": "ぶしょう"}]},
-      {"kanji": "製", "readings": [
-        {"type": "音読み", "reading": "セイ", "example": "缶詰の製造年月日。", "exampleKanji": [{"kanji": "製造", "reading": "せいぞう"}]}
-      ], "jukugo": [{"word": "製造", "reading": "せいぞう"}, {"word": "製作", "reading": "せいさく"}, {"word": "自家製", "reading": "じかせい"}, {"word": "外国製", "reading": "がいこくせい"}]},
-      {"kanji": "税", "readings": [
-        {"type": "音読み", "reading": "ゼイ", "example": "国民が税金を納める。", "exampleKanji": [{"kanji": "税金", "reading": "ぜいきん"}]}
-      ], "jukugo": [{"word": "税金", "reading": "ぜいきん"}, {"word": "税務", "reading": "ぜいむ"}, {"word": "課税", "reading": "かぜい"}, {"word": "納税", "reading": "のうぜい"}]},
-      {"kanji": "責", "readings": [
-        {"type": "音読み", "reading": "セキ", "example": "自責の念が強い人だ。", "exampleKanji": [{"kanji": "自責", "reading": "じせき"}]},
-        {"type": "訓読み", "reading": "せ（める）", "example": "首相の失政を責める。", "exampleKanji": []}
-      ], "jukugo": [{"word": "責任", "reading": "せきにん"}, {"word": "自責", "reading": "じせき"}, {"word": "職責", "reading": "しょくせき"}, {"word": "重責", "reading": "じゅうせき"}]}
+      {
+        "kanji": "織",
+        "readings": [
+          {
+            "type": "音読み",
+            "reading": "シキ・（ショク）",
+            "example": "労働組合を組織する。",
+            "exampleKanji": [
+              {
+                "kanji": "組織",
+                "reading": "そしき"
+              }
+            ]
+          },
+          {
+            "type": "訓読み",
+            "reading": "お（る）",
+            "example": "布を織る機械。",
+            "exampleKanji": []
+          }
+        ],
+        "jukugo": [
+          {
+            "word": "組織",
+            "reading": "そしき"
+          },
+          {
+            "word": "織物",
+            "reading": "おりもの"
+          },
+          {
+            "word": "染織",
+            "reading": "せんしょく"
+          }
+        ]
+      },
+      {
+        "kanji": "職",
+        "readings": [
+          {
+            "type": "音読み",
+            "reading": "ショク",
+            "example": "働きやすい職場に見入る。",
+            "exampleKanji": [
+              {
+                "kanji": "職場",
+                "reading": "しょくば"
+              }
+            ]
+          }
+        ],
+        "jukugo": [
+          {
+            "word": "職業",
+            "reading": "しょくぎょう"
+          },
+          {
+            "word": "職場",
+            "reading": "しょくば"
+          },
+          {
+            "word": "職務",
+            "reading": "しょくむ"
+          },
+          {
+            "word": "職人",
+            "reading": "しょくにん"
+          }
+        ]
+      },
+      {
+        "kanji": "制",
+        "readings": [
+          {
+            "type": "音読み",
+            "reading": "セイ",
+            "example": "教育制度を見直す。",
+            "exampleKanji": [
+              {
+                "kanji": "制度",
+                "reading": "せいど"
+              }
+            ]
+          }
+        ],
+        "jukugo": [
+          {
+            "word": "制度",
+            "reading": "せいど"
+          },
+          {
+            "word": "制限",
+            "reading": "せいげん"
+          },
+          {
+            "word": "制作",
+            "reading": "せいさく"
+          },
+          {
+            "word": "節制",
+            "reading": "せっせい"
+          }
+        ]
+      },
+      {
+        "kanji": "性",
+        "readings": [
+          {
+            "type": "音読み",
+            "reading": "セイ・（ショウ）",
+            "example": "氏名と性別を記す。",
+            "exampleKanji": [
+              {
+                "kanji": "性別",
+                "reading": "せいべつ"
+              }
+            ]
+          }
+        ],
+        "jukugo": [
+          {
+            "word": "性別",
+            "reading": "せいべつ"
+          },
+          {
+            "word": "品性",
+            "reading": "ひんせい"
+          },
+          {
+            "word": "人間性",
+            "reading": "にんげんせい"
+          },
+          {
+            "word": "根性",
+            "reading": "こんじょう"
+          }
+        ]
+      },
+      {
+        "kanji": "政",
+        "readings": [
+          {
+            "type": "音読み",
+            "reading": "セイ・（ショウ）",
+            "example": "首相が政府を率いる。",
+            "exampleKanji": [
+              {
+                "kanji": "政府",
+                "reading": "せいふ"
+              }
+            ]
+          },
+          {
+            "type": "訓読み",
+            "reading": "まつりごと",
+            "example": "国を治める政。",
+            "exampleKanji": []
+          }
+        ],
+        "jukugo": [
+          {
+            "word": "政治",
+            "reading": "せいじ"
+          },
+          {
+            "word": "政府",
+            "reading": "せいふ"
+          },
+          {
+            "word": "行政",
+            "reading": "ぎょうせい"
+          },
+          {
+            "word": "財政",
+            "reading": "ざいせい"
+          }
+        ]
+      },
+      {
+        "kanji": "勢",
+        "readings": [
+          {
+            "type": "音読み",
+            "reading": "セイ",
+            "example": "強い勢力の台風。",
+            "exampleKanji": [
+              {
+                "kanji": "勢力",
+                "reading": "せいりょく"
+              }
+            ]
+          },
+          {
+            "type": "訓読み",
+            "reading": "いきおい",
+            "example": "台風の勢いが強い。",
+            "exampleKanji": []
+          }
+        ],
+        "jukugo": [
+          {
+            "word": "勢力",
+            "reading": "せいりょく"
+          },
+          {
+            "word": "大勢",
+            "reading": "おおぜい"
+          },
+          {
+            "word": "姿勢",
+            "reading": "しせい"
+          },
+          {
+            "word": "軍勢",
+            "reading": "ぐんぜい"
+          }
+        ]
+      },
+      {
+        "kanji": "精",
+        "readings": [
+          {
+            "type": "音読み",
+            "reading": "セイ・（ショウ）",
+            "example": "芸の道に精進する。",
+            "exampleKanji": [
+              {
+                "kanji": "精進",
+                "reading": "しょうじん"
+              }
+            ]
+          }
+        ],
+        "jukugo": [
+          {
+            "word": "精神",
+            "reading": "せいしん"
+          },
+          {
+            "word": "精米",
+            "reading": "せいまい"
+          },
+          {
+            "word": "精通",
+            "reading": "せいつう"
+          },
+          {
+            "word": "不精",
+            "reading": "ぶしょう"
+          }
+        ]
+      },
+      {
+        "kanji": "製",
+        "readings": [
+          {
+            "type": "音読み",
+            "reading": "セイ",
+            "example": "缶詰の製造年月日。",
+            "exampleKanji": [
+              {
+                "kanji": "製造",
+                "reading": "せいぞう"
+              }
+            ]
+          }
+        ],
+        "jukugo": [
+          {
+            "word": "製造",
+            "reading": "せいぞう"
+          },
+          {
+            "word": "製作",
+            "reading": "せいさく"
+          },
+          {
+            "word": "自家製",
+            "reading": "じかせい"
+          },
+          {
+            "word": "外国製",
+            "reading": "がいこくせい"
+          }
+        ]
+      },
+      {
+        "kanji": "税",
+        "readings": [
+          {
+            "type": "音読み",
+            "reading": "ゼイ",
+            "example": "国民が税金を納める。",
+            "exampleKanji": [
+              {
+                "kanji": "税金",
+                "reading": "ぜいきん"
+              }
+            ]
+          }
+        ],
+        "jukugo": [
+          {
+            "word": "税金",
+            "reading": "ぜいきん"
+          },
+          {
+            "word": "税務",
+            "reading": "ぜいむ"
+          },
+          {
+            "word": "課税",
+            "reading": "かぜい"
+          },
+          {
+            "word": "納税",
+            "reading": "のうぜい"
+          }
+        ]
+      },
+      {
+        "kanji": "責",
+        "readings": [
+          {
+            "type": "音読み",
+            "reading": "セキ",
+            "example": "自責の念が強い人だ。",
+            "exampleKanji": [
+              {
+                "kanji": "自責",
+                "reading": "じせき"
+              }
+            ]
+          },
+          {
+            "type": "訓読み",
+            "reading": "せ（める）",
+            "example": "首相の失政を責める。",
+            "exampleKanji": []
+          }
+        ],
+        "jukugo": [
+          {
+            "word": "責任",
+            "reading": "せきにん"
+          },
+          {
+            "word": "自責",
+            "reading": "じせき"
+          },
+          {
+            "word": "職責",
+            "reading": "しょくせき"
+          },
+          {
+            "word": "重責",
+            "reading": "じゅうせき"
+          }
+        ]
+      }
     ]
   },
   {
@@ -238,94 +684,560 @@ var BUILTIN = [
     "title": "第4回",
     "kanjiList": "貯・張・停・提・程・適・統・堂・銅・導",
     "levels": [
-      {"level": 1, "questions": [
-        {"sentence": "ダムの{チョスイ}量。", "answer": "貯水"},
-        {"sentence": "河原にテントを{は}る。", "answer": "張"},
-        {"sentence": "各駅{テイシャ}の電車。", "answer": "停車"},
-        {"sentence": "宿題を{テイシュツ}する。", "answer": "提出"},
-        {"sentence": "小学三年生{テイド}の学力。", "answer": "程度"},
-        {"sentence": "稲の開花に{テキオウ}した考え。", "answer": "適応"},
-        {"sentence": "ケットウの良い犬を買う。", "answer": "血統"},
-        {"sentence": "お寺の{ホンドウ}を建てる。", "answer": "本堂"},
-        {"sentence": "十円{ドウカ}を発行する。", "answer": "銅貨"},
-        {"sentence": "新技術を{ドウニュウ}する。", "answer": "導入"}
-      ]},
-      {"level": 2, "questions": [
-        {"sentence": "お年玉を{チョキン}する。", "answer": "貯金"},
-        {"sentence": "水の表面{チョウリョク}。", "answer": "張力"},
-        {"sentence": "{テイデン}になり真っ暗だ。", "answer": "停電"},
-        {"sentence": "学級会で{テイアン}をする。", "answer": "提案"},
-        {"sentence": "成長の{カテイ}を録画する。", "answer": "過程"},
-        {"sentence": "{テキセツ}な言葉を探す。", "answer": "適切"},
-        {"sentence": "千年の{デントウ}がある祭り。", "answer": "伝統"},
-        {"sentence": "六時に{ショクドウ}へ行く。", "answer": "食堂"},
-        {"sentence": "足尾{ドウザン}のあと地。", "answer": "銅山"},
-        {"sentence": "コーチが選手を{シドウ}する。", "answer": "指導"}
-      ]},
-      {"level": 3, "questions": [
-        {"sentence": "米を{チョゾウ}しておく。", "answer": "貯蔵"},
-        {"sentence": "意見を{シュチョウ}する。", "answer": "主張"},
-        {"sentence": "争いを{チョウテイ}する。", "answer": "調停"},
-        {"sentence": "てさげぶくろに{い}れる。", "answer": "提"},
-        {"sentence": "旅行の{ニッテイ}が決まる。", "answer": "日程"},
-        {"sentence": "時代に{テキオウ}した考え。", "answer": "適応"},
-        {"sentence": "二つの銀行を{トウゴウ}する。", "answer": "統合"},
-        {"sentence": "{コウカイドウ}に集まる。", "answer": "公会堂"},
-        {"sentence": "{ドウセン}は電気をよく通す。", "answer": "銅線"},
-        {"sentence": "{ハンドウタイ}を使った機器。", "answer": "半導体"}
-      ]},
-      {"level": 4, "questions": [
-        {"sentence": "水道の{チョスイチ}を見学する。", "answer": "貯水池"},
-        {"sentence": "父が{シュッチョウ}から帰る。", "answer": "出張"},
-        {"sentence": "両軍の{テイセン}が決まる。", "answer": "停戦"},
-        {"sentence": "会議で問題を{テイキ}する。", "answer": "提起"},
-        {"sentence": "悪さをするにも{ホド}がある。", "answer": "程"},
-        {"sentence": "{カイテキ}な旅行を楽しむ。", "answer": "快適"},
-        {"sentence": "人口変化の{トウケイ}をとる。", "answer": "統計"},
-        {"sentence": "{ドウドウ}と意見をのべる。", "answer": "堂堂"},
-        {"sentence": "駅前に{ドウゾウ}を建てる。", "answer": "銅像"},
-        {"sentence": "人々を仏門に{みちび}く。", "answer": "導"}
-      ]}
+      {
+        "level": 1,
+        "questions": [
+          {
+            "sentence": "ダムの{チョスイ}量。",
+            "answer": "貯水"
+          },
+          {
+            "sentence": "河原にテントを{は}る。",
+            "answer": "張"
+          },
+          {
+            "sentence": "各駅{テイシャ}の電車。",
+            "answer": "停車"
+          },
+          {
+            "sentence": "宿題を{テイシュツ}する。",
+            "answer": "提出"
+          },
+          {
+            "sentence": "小学三年生{テイド}の学力。",
+            "answer": "程度"
+          },
+          {
+            "sentence": "稲の開花に{テキオウ}した考え。",
+            "answer": "適応"
+          },
+          {
+            "sentence": "{ケットウ}の良い犬を買う。",
+            "answer": "血統"
+          },
+          {
+            "sentence": "お寺の{ホンドウ}を建てる。",
+            "answer": "本堂"
+          },
+          {
+            "sentence": "十円{ドウカ}を発行する。",
+            "answer": "銅貨"
+          },
+          {
+            "sentence": "新技術を{ドウニュウ}する。",
+            "answer": "導入"
+          }
+        ]
+      },
+      {
+        "level": 2,
+        "questions": [
+          {
+            "sentence": "お年玉を{チョキン}する。",
+            "answer": "貯金"
+          },
+          {
+            "sentence": "水の表面{チョウリョク}。",
+            "answer": "張力"
+          },
+          {
+            "sentence": "{テイデン}になり真っ暗だ。",
+            "answer": "停電"
+          },
+          {
+            "sentence": "学級会で{テイアン}をする。",
+            "answer": "提案"
+          },
+          {
+            "sentence": "成長の{カテイ}を録画する。",
+            "answer": "過程"
+          },
+          {
+            "sentence": "{テキセツ}な言葉を探す。",
+            "answer": "適切"
+          },
+          {
+            "sentence": "千年の{デントウ}がある祭り。",
+            "answer": "伝統"
+          },
+          {
+            "sentence": "六時に{ショクドウ}へ行く。",
+            "answer": "食堂"
+          },
+          {
+            "sentence": "足尾{ドウザン}のあと地。",
+            "answer": "銅山"
+          },
+          {
+            "sentence": "コーチが選手を{シドウ}する。",
+            "answer": "指導"
+          }
+        ]
+      },
+      {
+        "level": 3,
+        "questions": [
+          {
+            "sentence": "米を{チョゾウ}しておく。",
+            "answer": "貯蔵"
+          },
+          {
+            "sentence": "意見を{シュチョウ}する。",
+            "answer": "主張"
+          },
+          {
+            "sentence": "争いを{チョウテイ}する。",
+            "answer": "調停"
+          },
+          {
+            "sentence": "てさげぶくろに{い}れる。",
+            "answer": "提"
+          },
+          {
+            "sentence": "旅行の{ニッテイ}が決まる。",
+            "answer": "日程"
+          },
+          {
+            "sentence": "時代に{テキオウ}した考え。",
+            "answer": "適応"
+          },
+          {
+            "sentence": "二つの銀行を{トウゴウ}する。",
+            "answer": "統合"
+          },
+          {
+            "sentence": "{コウカイドウ}に集まる。",
+            "answer": "公会堂"
+          },
+          {
+            "sentence": "{ドウセン}は電気をよく通す。",
+            "answer": "銅線"
+          },
+          {
+            "sentence": "{ハンドウタイ}を使った機器。",
+            "answer": "半導体"
+          }
+        ]
+      },
+      {
+        "level": 4,
+        "questions": [
+          {
+            "sentence": "水道の{チョスイチ}を見学する。",
+            "answer": "貯水池"
+          },
+          {
+            "sentence": "父が{シュッチョウ}から帰る。",
+            "answer": "出張"
+          },
+          {
+            "sentence": "両軍の{テイセン}が決まる。",
+            "answer": "停戦"
+          },
+          {
+            "sentence": "会議で問題を{テイキ}する。",
+            "answer": "提起"
+          },
+          {
+            "sentence": "悪さをするにも{ホド}がある。",
+            "answer": "程"
+          },
+          {
+            "sentence": "{カイテキ}な旅行を楽しむ。",
+            "answer": "快適"
+          },
+          {
+            "sentence": "人口変化の{トウケイ}をとる。",
+            "answer": "統計"
+          },
+          {
+            "sentence": "{ドウドウ}と意見をのべる。",
+            "answer": "堂堂"
+          },
+          {
+            "sentence": "駅前に{ドウゾウ}を建てる。",
+            "answer": "銅像"
+          },
+          {
+            "sentence": "人々を仏門に{みちび}く。",
+            "answer": "導"
+          }
+        ]
+      }
     ],
     "kanjiData": [
-      {"kanji": "貯", "readings": [
-        {"type": "音読み", "reading": "チョ", "example": "お年玉を貯金する。", "exampleKanji": [{"kanji": "貯金", "reading": "ちょきん"}]}
-      ], "jukugo": [{"word": "貯金", "reading": "ちょきん"}, {"word": "貯水", "reading": "ちょすい"}, {"word": "貯蔵", "reading": "ちょぞう"}, {"word": "貯蓄", "reading": "ちょちく"}]},
-      {"kanji": "張", "readings": [
-        {"type": "音読み", "reading": "チョウ", "example": "意見を主張する。", "exampleKanji": [{"kanji": "主張", "reading": "しゅちょう"}]},
-        {"type": "訓読み", "reading": "は（る）", "example": "河原にテントを張る。", "exampleKanji": []}
-      ], "jukugo": [{"word": "主張", "reading": "しゅちょう"}, {"word": "出張", "reading": "しゅっちょう"}, {"word": "拡張", "reading": "かくちょう"}, {"word": "張力", "reading": "ちょうりょく"}]},
-      {"kanji": "停", "readings": [
-        {"type": "音読み", "reading": "テイ", "example": "信号で車が停止する。", "exampleKanji": [{"kanji": "停止", "reading": "ていし"}]}
-      ], "jukugo": [{"word": "停車", "reading": "ていしゃ"}, {"word": "停止", "reading": "ていし"}, {"word": "停電", "reading": "ていでん"}, {"word": "調停", "reading": "ちょうてい"}]},
-      {"kanji": "提", "readings": [
-        {"type": "音読み", "reading": "テイ", "example": "宿題を提出する。", "exampleKanji": [{"kanji": "提出", "reading": "ていしゅつ"}]},
-        {"type": "訓読み", "reading": "さ（げる）", "example": "荷物を提げて歩く。", "exampleKanji": []}
-      ], "jukugo": [{"word": "提出", "reading": "ていしゅつ"}, {"word": "提案", "reading": "ていあん"}, {"word": "提示", "reading": "ていじ"}, {"word": "前提", "reading": "ぜんてい"}]},
-      {"kanji": "程", "readings": [
-        {"type": "音読み", "reading": "テイ", "example": "旅行の日程が決まる。", "exampleKanji": [{"kanji": "日程", "reading": "にってい"}]},
-        {"type": "訓読み", "reading": "ほど", "example": "仕事の程合いをみる。", "exampleKanji": []}
-      ], "jukugo": [{"word": "日程", "reading": "にってい"}, {"word": "工程", "reading": "こうてい"}, {"word": "過程", "reading": "かてい"}, {"word": "行程", "reading": "こうてい"}]},
-      {"kanji": "適", "readings": [
-        {"type": "音読み", "reading": "テキ", "example": "適切な言葉を探す。", "exampleKanji": [{"kanji": "適切", "reading": "てきせつ"}]}
-      ], "jukugo": [{"word": "適切", "reading": "てきせつ"}, {"word": "適当", "reading": "てきとう"}, {"word": "適応", "reading": "てきおう"}, {"word": "快適", "reading": "かいてき"}]},
-      {"kanji": "統", "readings": [
-        {"type": "音読み", "reading": "トウ", "example": "千年の伝統がある祭り。", "exampleKanji": [{"kanji": "伝統", "reading": "でんとう"}]},
-        {"type": "訓読み", "reading": "す（べる）", "example": "二つの銀行を統合する。", "exampleKanji": [{"kanji": "統合", "reading": "とうごう"}]}
-      ], "jukugo": [{"word": "伝統", "reading": "でんとう"}, {"word": "統計", "reading": "とうけい"}, {"word": "統合", "reading": "とうごう"}, {"word": "統制", "reading": "とうせい"}]},
-      {"kanji": "堂", "readings": [
-        {"type": "音読み", "reading": "ドウ", "example": "お寺の本堂を建てる。", "exampleKanji": [{"kanji": "本堂", "reading": "ほんどう"}]}
-      ], "jukugo": [{"word": "本堂", "reading": "ほんどう"}, {"word": "食堂", "reading": "しょくどう"}, {"word": "公会堂", "reading": "こうかいどう"}, {"word": "母堂", "reading": "ぼどう"}]},
-      {"kanji": "銅", "readings": [
-        {"type": "音読み", "reading": "ドウ", "example": "駅前に銅像を建てる。", "exampleKanji": [{"kanji": "銅像", "reading": "どうぞう"}]}
-      ], "jukugo": [{"word": "銅像", "reading": "どうぞう"}, {"word": "銅貨", "reading": "どうか"}, {"word": "銅山", "reading": "どうざん"}, {"word": "青銅", "reading": "せいどう"}]},
-      {"kanji": "導", "readings": [
-        {"type": "音読み", "reading": "ドウ", "example": "新技術を導入する。", "exampleKanji": [{"kanji": "導入", "reading": "どうにゅう"}]},
-        {"type": "訓読み", "reading": "みちび（く）", "example": "コーチが選手を指導する。", "exampleKanji": [{"kanji": "指導", "reading": "しどう"}]}
-      ], "jukugo": [{"word": "指導", "reading": "しどう"}, {"word": "導入", "reading": "どうにゅう"}, {"word": "先導", "reading": "せんどう"}, {"word": "半導体", "reading": "はんどうたい"}]}
+      {
+        "kanji": "貯",
+        "readings": [
+          {
+            "type": "音読み",
+            "reading": "チョ",
+            "example": "お年玉を貯金する。",
+            "exampleKanji": [
+              {
+                "kanji": "貯金",
+                "reading": "ちょきん"
+              }
+            ]
+          }
+        ],
+        "jukugo": [
+          {
+            "word": "貯金",
+            "reading": "ちょきん"
+          },
+          {
+            "word": "貯水",
+            "reading": "ちょすい"
+          },
+          {
+            "word": "貯蔵",
+            "reading": "ちょぞう"
+          },
+          {
+            "word": "貯蓄",
+            "reading": "ちょちく"
+          }
+        ]
+      },
+      {
+        "kanji": "張",
+        "readings": [
+          {
+            "type": "音読み",
+            "reading": "チョウ",
+            "example": "意見を主張する。",
+            "exampleKanji": [
+              {
+                "kanji": "主張",
+                "reading": "しゅちょう"
+              }
+            ]
+          },
+          {
+            "type": "訓読み",
+            "reading": "は（る）",
+            "example": "河原にテントを張る。",
+            "exampleKanji": []
+          }
+        ],
+        "jukugo": [
+          {
+            "word": "主張",
+            "reading": "しゅちょう"
+          },
+          {
+            "word": "出張",
+            "reading": "しゅっちょう"
+          },
+          {
+            "word": "拡張",
+            "reading": "かくちょう"
+          },
+          {
+            "word": "張力",
+            "reading": "ちょうりょく"
+          }
+        ]
+      },
+      {
+        "kanji": "停",
+        "readings": [
+          {
+            "type": "音読み",
+            "reading": "テイ",
+            "example": "信号で車が停止する。",
+            "exampleKanji": [
+              {
+                "kanji": "停止",
+                "reading": "ていし"
+              }
+            ]
+          }
+        ],
+        "jukugo": [
+          {
+            "word": "停車",
+            "reading": "ていしゃ"
+          },
+          {
+            "word": "停止",
+            "reading": "ていし"
+          },
+          {
+            "word": "停電",
+            "reading": "ていでん"
+          },
+          {
+            "word": "調停",
+            "reading": "ちょうてい"
+          }
+        ]
+      },
+      {
+        "kanji": "提",
+        "readings": [
+          {
+            "type": "音読み",
+            "reading": "テイ",
+            "example": "宿題を提出する。",
+            "exampleKanji": [
+              {
+                "kanji": "提出",
+                "reading": "ていしゅつ"
+              }
+            ]
+          },
+          {
+            "type": "訓読み",
+            "reading": "さ（げる）",
+            "example": "荷物を提げて歩く。",
+            "exampleKanji": []
+          }
+        ],
+        "jukugo": [
+          {
+            "word": "提出",
+            "reading": "ていしゅつ"
+          },
+          {
+            "word": "提案",
+            "reading": "ていあん"
+          },
+          {
+            "word": "提示",
+            "reading": "ていじ"
+          },
+          {
+            "word": "前提",
+            "reading": "ぜんてい"
+          }
+        ]
+      },
+      {
+        "kanji": "程",
+        "readings": [
+          {
+            "type": "音読み",
+            "reading": "テイ",
+            "example": "旅行の日程が決まる。",
+            "exampleKanji": [
+              {
+                "kanji": "日程",
+                "reading": "にってい"
+              }
+            ]
+          },
+          {
+            "type": "訓読み",
+            "reading": "ほど",
+            "example": "仕事の程合いをみる。",
+            "exampleKanji": []
+          }
+        ],
+        "jukugo": [
+          {
+            "word": "日程",
+            "reading": "にってい"
+          },
+          {
+            "word": "工程",
+            "reading": "こうてい"
+          },
+          {
+            "word": "過程",
+            "reading": "かてい"
+          },
+          {
+            "word": "行程",
+            "reading": "こうてい"
+          }
+        ]
+      },
+      {
+        "kanji": "適",
+        "readings": [
+          {
+            "type": "音読み",
+            "reading": "テキ",
+            "example": "適切な言葉を探す。",
+            "exampleKanji": [
+              {
+                "kanji": "適切",
+                "reading": "てきせつ"
+              }
+            ]
+          }
+        ],
+        "jukugo": [
+          {
+            "word": "適切",
+            "reading": "てきせつ"
+          },
+          {
+            "word": "適当",
+            "reading": "てきとう"
+          },
+          {
+            "word": "適応",
+            "reading": "てきおう"
+          },
+          {
+            "word": "快適",
+            "reading": "かいてき"
+          }
+        ]
+      },
+      {
+        "kanji": "統",
+        "readings": [
+          {
+            "type": "音読み",
+            "reading": "トウ",
+            "example": "千年の伝統がある祭り。",
+            "exampleKanji": [
+              {
+                "kanji": "伝統",
+                "reading": "でんとう"
+              }
+            ]
+          },
+          {
+            "type": "訓読み",
+            "reading": "す（べる）",
+            "example": "国民を統べる。",
+            "exampleKanji": []
+          }
+        ],
+        "jukugo": [
+          {
+            "word": "伝統",
+            "reading": "でんとう"
+          },
+          {
+            "word": "統計",
+            "reading": "とうけい"
+          },
+          {
+            "word": "統合",
+            "reading": "とうごう"
+          },
+          {
+            "word": "統制",
+            "reading": "とうせい"
+          }
+        ]
+      },
+      {
+        "kanji": "堂",
+        "readings": [
+          {
+            "type": "音読み",
+            "reading": "ドウ",
+            "example": "お寺の本堂を建てる。",
+            "exampleKanji": [
+              {
+                "kanji": "本堂",
+                "reading": "ほんどう"
+              }
+            ]
+          }
+        ],
+        "jukugo": [
+          {
+            "word": "本堂",
+            "reading": "ほんどう"
+          },
+          {
+            "word": "食堂",
+            "reading": "しょくどう"
+          },
+          {
+            "word": "公会堂",
+            "reading": "こうかいどう"
+          },
+          {
+            "word": "母堂",
+            "reading": "ぼどう"
+          }
+        ]
+      },
+      {
+        "kanji": "銅",
+        "readings": [
+          {
+            "type": "音読み",
+            "reading": "ドウ",
+            "example": "駅前に銅像を建てる。",
+            "exampleKanji": [
+              {
+                "kanji": "銅像",
+                "reading": "どうぞう"
+              }
+            ]
+          }
+        ],
+        "jukugo": [
+          {
+            "word": "銅像",
+            "reading": "どうぞう"
+          },
+          {
+            "word": "銅貨",
+            "reading": "どうか"
+          },
+          {
+            "word": "銅山",
+            "reading": "どうざん"
+          },
+          {
+            "word": "青銅",
+            "reading": "せいどう"
+          }
+        ]
+      },
+      {
+        "kanji": "導",
+        "readings": [
+          {
+            "type": "音読み",
+            "reading": "ドウ",
+            "example": "新技術を導入する。",
+            "exampleKanji": [
+              {
+                "kanji": "導入",
+                "reading": "どうにゅう"
+              }
+            ]
+          },
+          {
+            "type": "訓読み",
+            "reading": "みちび（く）",
+            "example": "人々を仏門に導く。",
+            "exampleKanji": []
+          }
+        ],
+        "jukugo": [
+          {
+            "word": "指導",
+            "reading": "しどう"
+          },
+          {
+            "word": "導入",
+            "reading": "どうにゅう"
+          },
+          {
+            "word": "先導",
+            "reading": "せんどう"
+          },
+          {
+            "word": "半導体",
+            "reading": "はんどうたい"
+          }
+        ]
+      }
     ]
-  }
-,
+  },
   {
     "id": 2,
     "title": "第2回",
@@ -517,190 +1429,370 @@ var BUILTIN = [
         "kanji": "績",
         "readings": [
           {
-            "type": "音",
-            "reading": "セキ"
+            "type": "音読み",
+            "reading": "セキ",
+            "example": "先人の功績をたたえる。",
+            "exampleKanji": [
+              {
+                "kanji": "功績",
+                "reading": "こうせき"
+              }
+            ]
           }
         ],
-        "examples": [
-          "成績・功績・業績・実績・戦績"
-        ],
-        "compounds": [
-          "成績（なしとげられた実際の仕事）",
-          "功績（社会や仕事のためになりりっぱな成果）",
-          "業績（事業や文化などでなしとげられた成果）"
+        "jukugo": [
+          {
+            "word": "成績",
+            "reading": "せいせき"
+          },
+          {
+            "word": "功績",
+            "reading": "こうせき"
+          },
+          {
+            "word": "業績",
+            "reading": "ぎょうせき"
+          },
+          {
+            "word": "実績",
+            "reading": "じっせき"
+          }
         ]
       },
       {
         "kanji": "接",
         "readings": [
           {
-            "type": "音",
-            "reading": "セツ"
+            "type": "音読み",
+            "reading": "セツ",
+            "example": "面接試験を受ける。",
+            "exampleKanji": [
+              {
+                "kanji": "面接",
+                "reading": "めんせつ"
+              }
+            ]
           },
           {
-            "type": "訓",
-            "reading": "つ（ぐ）"
+            "type": "訓読み",
+            "reading": "つ（ぐ）",
+            "example": "木に竹を接ぐような話だ。",
+            "exampleKanji": []
           }
         ],
-        "examples": [
-          "接続・直接・面接・接近・接点"
-        ],
-        "compounds": [
-          "接続（つながること）",
-          "直接（間に何もはさまず、じかにふれていること）",
-          "面接（じかにその人に会うこと）"
+        "jukugo": [
+          {
+            "word": "接続",
+            "reading": "せつぞく"
+          },
+          {
+            "word": "直接",
+            "reading": "ちょくせつ"
+          },
+          {
+            "word": "面接",
+            "reading": "めんせつ"
+          },
+          {
+            "word": "接触",
+            "reading": "せっしょく"
+          }
         ]
       },
       {
         "kanji": "設",
         "readings": [
           {
-            "type": "音",
-            "reading": "セツ"
+            "type": "音読み",
+            "reading": "セツ",
+            "example": "船の設計図をかく。",
+            "exampleKanji": [
+              {
+                "kanji": "設計",
+                "reading": "せっけい"
+              }
+            ]
           },
           {
-            "type": "訓",
-            "reading": "もう（ける）"
+            "type": "訓読み",
+            "reading": "もう（ける）",
+            "example": "話し合う機会を設ける。",
+            "exampleKanji": []
           }
         ],
-        "examples": [
-          "設計・建設・設備・設立・常設"
-        ],
-        "compounds": [
-          "設計（つくる物の図をかくこと）",
-          "建設（建物をつくること）",
-          "設備（会や施設などをそなえること）"
+        "jukugo": [
+          {
+            "word": "設計",
+            "reading": "せっけい"
+          },
+          {
+            "word": "建設",
+            "reading": "けんせつ"
+          },
+          {
+            "word": "設置",
+            "reading": "せっち"
+          },
+          {
+            "word": "開設",
+            "reading": "かいせつ"
+          }
         ]
       },
       {
         "kanji": "絶",
         "readings": [
           {
-            "type": "音",
-            "reading": "ゼツ"
+            "type": "音読み",
+            "reading": "ゼツ",
+            "example": "暴力を根絶する。",
+            "exampleKanji": [
+              {
+                "kanji": "根絶",
+                "reading": "こんぜつ"
+              }
+            ]
           },
           {
-            "type": "訓",
-            "reading": "た（える）・た（やす）・た（つ）"
+            "type": "訓読み",
+            "reading": "た（える）・た（やす）・た（つ）",
+            "example": "野生動物の種が絶える。",
+            "exampleKanji": []
           }
         ],
-        "examples": [
-          "根絶・絶好・絶大・絶海・謝絶"
-        ],
-        "compounds": [
-          "根絶（根本からなくすこと）",
-          "絶好（何かをするのにちょうどよいこと）",
-          "絶大（はなはだ大きいよう）"
+        "jukugo": [
+          {
+            "word": "根絶",
+            "reading": "こんぜつ"
+          },
+          {
+            "word": "絶好",
+            "reading": "ぜっこう"
+          },
+          {
+            "word": "絶大",
+            "reading": "ぜつだい"
+          },
+          {
+            "word": "絶滅",
+            "reading": "ぜつめつ"
+          }
         ]
       },
       {
         "kanji": "祖",
         "readings": [
           {
-            "type": "音",
-            "reading": "ソ"
+            "type": "音読み",
+            "reading": "ソ",
+            "example": "祖先の墓にお参りする。",
+            "exampleKanji": [
+              {
+                "kanji": "祖先",
+                "reading": "そせん"
+              }
+            ]
           }
         ],
-        "examples": [
-          "祖国・祖先・祖母・教祖・父祖"
-        ],
-        "compounds": [
-          "祖国（自分の生まれ育った国）",
-          "祖先（父と父以前の祖先）",
-          "祖母（父の母または母の母）"
+        "jukugo": [
+          {
+            "word": "祖国",
+            "reading": "そこく"
+          },
+          {
+            "word": "祖先",
+            "reading": "そせん"
+          },
+          {
+            "word": "祖母",
+            "reading": "そぼ"
+          },
+          {
+            "word": "教祖",
+            "reading": "きょうそ"
+          }
         ]
       },
       {
         "kanji": "素",
         "readings": [
           {
-            "type": "音",
-            "reading": "ソ・（ス）"
+            "type": "音読み",
+            "reading": "ソ・（ス）",
+            "example": "素材の味を生かした料理。",
+            "exampleKanji": [
+              {
+                "kanji": "素材",
+                "reading": "そざい"
+              }
+            ]
           }
         ],
-        "examples": [
-          "素材・素行・平素・元素・素質"
-        ],
-        "compounds": [
-          "素材（もとになる材料）",
-          "素行（ふだんのおこない）",
-          "元素（化学的に分解できる最小単位のもの）"
+        "jukugo": [
+          {
+            "word": "素材",
+            "reading": "そざい"
+          },
+          {
+            "word": "三原素",
+            "reading": "さんげんそ"
+          },
+          {
+            "word": "素行",
+            "reading": "そこう"
+          },
+          {
+            "word": "平素",
+            "reading": "へいそ"
+          }
         ]
       },
       {
         "kanji": "総",
         "readings": [
           {
-            "type": "音",
-            "reading": "ソウ"
+            "type": "音読み",
+            "reading": "ソウ",
+            "example": "四教科の総合成績を確認する。",
+            "exampleKanji": [
+              {
+                "kanji": "総合",
+                "reading": "そうごう"
+              }
+            ]
           }
         ],
-        "examples": [
-          "総合・総数・総意・総理・総務"
-        ],
-        "compounds": [
-          "総合（一つにまとめること）",
-          "総数（全体の数）",
-          "総意（全員の考え）"
+        "jukugo": [
+          {
+            "word": "総合",
+            "reading": "そうごう"
+          },
+          {
+            "word": "総数",
+            "reading": "そうすう"
+          },
+          {
+            "word": "総意",
+            "reading": "そうい"
+          },
+          {
+            "word": "総理",
+            "reading": "そうり"
+          }
         ]
       },
       {
         "kanji": "造",
         "readings": [
           {
-            "type": "音",
-            "reading": "ゾウ"
+            "type": "音読み",
+            "reading": "ゾウ",
+            "example": "造船業がさかんな町。",
+            "exampleKanji": [
+              {
+                "kanji": "造船",
+                "reading": "ぞうせん"
+              }
+            ]
           },
           {
-            "type": "訓",
-            "reading": "つく（る）"
+            "type": "訓読み",
+            "reading": "つく（る）",
+            "example": "引っ越しの荷造りをする。",
+            "exampleKanji": []
           }
         ],
-        "examples": [
-          "造船・改造・木造・荷造・造形"
-        ],
-        "compounds": [
-          "造船（船をつくること）",
-          "改造（つくり直すこと）",
-          "木造（木を材料にしてできるもの）"
+        "jukugo": [
+          {
+            "word": "造船",
+            "reading": "ぞうせん"
+          },
+          {
+            "word": "改造",
+            "reading": "かいぞう"
+          },
+          {
+            "word": "木造",
+            "reading": "もくぞう"
+          },
+          {
+            "word": "荷造",
+            "reading": "にづくり"
+          }
         ]
       },
       {
         "kanji": "像",
         "readings": [
           {
-            "type": "音",
-            "reading": "ゾウ"
+            "type": "音読み",
+            "reading": "ゾウ",
+            "example": "画像の美しいテレビ。",
+            "exampleKanji": [
+              {
+                "kanji": "画像",
+                "reading": "がぞう"
+              }
+            ]
           }
         ],
-        "examples": [
-          "想像・残像・画像・仏像・映像"
-        ],
-        "compounds": [
-          "想像（実際に見ていないすがたを心にうかべること）",
-          "残像（形が消えた後もなおそれがあるように感じられること）",
-          "画像（実際に見えるすがた）"
+        "jukugo": [
+          {
+            "word": "画像",
+            "reading": "がぞう"
+          },
+          {
+            "word": "残像",
+            "reading": "ざんぞう"
+          },
+          {
+            "word": "想像",
+            "reading": "そうぞう"
+          },
+          {
+            "word": "仏像",
+            "reading": "ぶつぞう"
+          }
         ]
       },
       {
         "kanji": "増",
         "readings": [
           {
-            "type": "音",
-            "reading": "ゾウ"
+            "type": "音読み",
+            "reading": "ゾウ",
+            "example": "体力を増強する。",
+            "exampleKanji": [
+              {
+                "kanji": "増強",
+                "reading": "ぞうきょう"
+              }
+            ]
           },
           {
-            "type": "訓",
-            "reading": "ま（す）・ふ（える）・ふ（やす）"
+            "type": "訓読み",
+            "reading": "ま（す）・ふ（える）・ふ（やす）",
+            "example": "台風で川の水量が増す。",
+            "exampleKanji": []
           }
         ],
-        "examples": [
-          "増強・増加・増水・増進・増長"
-        ],
-        "compounds": [
-          "増強（ふやして力を強くすること）",
-          "増加（量や数がふえること）",
-          "増水（川などの水の量がふえること）"
+        "jukugo": [
+          {
+            "word": "増強",
+            "reading": "ぞうきょう"
+          },
+          {
+            "word": "増加",
+            "reading": "ぞうか"
+          },
+          {
+            "word": "増水",
+            "reading": "ぞうすい"
+          },
+          {
+            "word": "増長",
+            "reading": "ぞうちょう"
+          }
         ]
       }
     ]
@@ -713,105 +1805,569 @@ var BUILTIN = [
       {
         "level": 1,
         "questions": [
-          {"sentence": "試合で{ハンソク}をおかす。", "answer": "反則"},
-          {"sentence": "体重を{ソクテイ}する。", "answer": "測定"},
-          {"sentence": "会社での{ハイゾク}が決まる。", "answer": "配属"},
-          {"sentence": "十万の兵士を{ひき}いる将軍。", "answer": "率"},
-          {"sentence": "百万円の{ソンシツ}だ。", "answer": "損失"},
-          {"sentence": "お金の{かし}かりはしない。", "answer": "貸"},
-          {"sentence": "活動は休止の{ジョウタイ}だ。", "answer": "状態"},
-          {"sentence": "花より{ダンゴ}。", "answer": "団子"},
-          {"sentence": "ロープを{セツダン}して外出する。", "answer": "切断"},
-          {"sentence": "住宅を{ケンチク}する。", "answer": "建築"}
+          {
+            "sentence": "試合で{ハンソク}をおかす。",
+            "answer": "反則"
+          },
+          {
+            "sentence": "体重を{ソクテイ}する。",
+            "answer": "測定"
+          },
+          {
+            "sentence": "会社での{ハイゾク}が決まる。",
+            "answer": "配属"
+          },
+          {
+            "sentence": "十万の兵士を{ひき}いる将軍。",
+            "answer": "率"
+          },
+          {
+            "sentence": "百万円の{ソンシツ}だ。",
+            "answer": "損失"
+          },
+          {
+            "sentence": "お金の{かし}かりはしない。",
+            "answer": "貸"
+          },
+          {
+            "sentence": "活動は休止の{ジョウタイ}だ。",
+            "answer": "状態"
+          },
+          {
+            "sentence": "花より{ダンゴ}。",
+            "answer": "団子"
+          },
+          {
+            "sentence": "ロープを{セツダン}して外出する。",
+            "answer": "切断"
+          },
+          {
+            "sentence": "住宅を{ケンチク}する。",
+            "answer": "建築"
+          }
         ]
       },
       {
         "level": 2,
         "questions": [
-          {"sentence": "{コウソク}に違反する服装。", "answer": "校則"},
-          {"sentence": "全国の川の長さを{はか}る。", "answer": "測"},
-          {"sentence": "大学の{フゾク}中学に進む。", "answer": "付属"},
-          {"sentence": "先生が生徒を{インソツ}する。", "answer": "引率"},
-          {"sentence": "父のきげんを{そこ}ねる。", "answer": "損"},
-          {"sentence": "図書館で本を{かしだ}す。", "answer": "貸出"},
-          {"sentence": "鳥の{セイタイ}を研究する。", "answer": "生態"},
-          {"sentence": "剣道の{ダンタイ}戦に出る。", "answer": "団体"},
-          {"sentence": "三十年飲み続けた酒を{た}つ。", "answer": "断"},
-          {"sentence": "子ども部屋を{ゾウチク}する。", "answer": "増築"}
+          {
+            "sentence": "{コウソク}に違反する服装。",
+            "answer": "校則"
+          },
+          {
+            "sentence": "全国の川の長さを{はか}る。",
+            "answer": "測"
+          },
+          {
+            "sentence": "大学の{フゾク}中学に進む。",
+            "answer": "付属"
+          },
+          {
+            "sentence": "先生が生徒を{インソツ}する。",
+            "answer": "引率"
+          },
+          {
+            "sentence": "父のきげんを{そこ}ねる。",
+            "answer": "損"
+          },
+          {
+            "sentence": "図書館で本を{かしだ}す。",
+            "answer": "貸出"
+          },
+          {
+            "sentence": "鳥の{セイタイ}を研究する。",
+            "answer": "生態"
+          },
+          {
+            "sentence": "剣道の{ダンタイ}戦に出る。",
+            "answer": "団体"
+          },
+          {
+            "sentence": "三十年飲み続けた酒を{た}つ。",
+            "answer": "断"
+          },
+          {
+            "sentence": "子ども部屋を{ゾウチク}する。",
+            "answer": "増築"
+          }
         ]
       },
       {
         "level": 3,
         "questions": [
-          {"sentence": "自然の{ホウソク}に従う。", "answer": "法則"},
-          {"sentence": "天体{カンソク}が趣味だ。", "answer": "観測"},
-          {"sentence": "野球部に{ショゾク}する。", "answer": "所属"},
-          {"sentence": "仕事の{コウリツ}が上がる。", "answer": "効率"},
-          {"sentence": "車の{ハソン}具合を調べる。", "answer": "破損"},
-          {"sentence": "お金の{かしき}りバスで旅行する。", "answer": "貸切"},
-          {"sentence": "受け入れ{タイセイ}を整える。", "answer": "態勢"},
-          {"sentence": "{シュウダン}で登校する。", "answer": "集団"},
-          {"sentence": "大丈夫だと{ダンゲン}する。", "answer": "断言"},
-          {"sentence": "新しい理論を{コウチク}する。", "answer": "構築"}
+          {
+            "sentence": "自然の{ホウソク}に従う。",
+            "answer": "法則"
+          },
+          {
+            "sentence": "天体{カンソク}が趣味だ。",
+            "answer": "観測"
+          },
+          {
+            "sentence": "野球部に{ショゾク}する。",
+            "answer": "所属"
+          },
+          {
+            "sentence": "仕事の{コウリツ}が上がる。",
+            "answer": "効率"
+          },
+          {
+            "sentence": "車の{ハソン}具合を調べる。",
+            "answer": "破損"
+          },
+          {
+            "sentence": "お金の{かしき}りバスで旅行する。",
+            "answer": "貸切"
+          },
+          {
+            "sentence": "受け入れ{タイセイ}を整える。",
+            "answer": "態勢"
+          },
+          {
+            "sentence": "{シュウダン}で登校する。",
+            "answer": "集団"
+          },
+          {
+            "sentence": "大丈夫だと{ダンゲン}する。",
+            "answer": "断言"
+          },
+          {
+            "sentence": "新しい理論を{コウチク}する。",
+            "answer": "構築"
+          }
         ]
       },
       {
         "level": 4,
         "questions": [
-          {"sentence": "{ゲンソク}と例外を区別する。", "answer": "原則"},
-          {"sentence": "天候の{ヨソク}がつかない。", "answer": "予測"},
-          {"sentence": "{キンゾク}は電気を通す。", "answer": "金属"},
-          {"sentence": "{ソッチョク}に意見を述べる。", "answer": "率直"},
-          {"sentence": "はがきを{かきそん}じる。", "answer": "書き損"},
-          {"sentence": "銀行との{タイシャク}関係。", "answer": "貸借"},
-          {"sentence": "礼儀正しい{タイド}をとる。", "answer": "態度"},
-          {"sentence": "郊外の{ダンチ}に住む。", "answer": "団地"},
-          {"sentence": "母に{ことわ}って外出する。", "answer": "断"},
-          {"sentence": "不動の地位を{きず}く。", "answer": "築"}
+          {
+            "sentence": "{ゲンソク}と例外を区別する。",
+            "answer": "原則"
+          },
+          {
+            "sentence": "天候の{ヨソク}がつかない。",
+            "answer": "予測"
+          },
+          {
+            "sentence": "{キンゾク}は電気を通す。",
+            "answer": "金属"
+          },
+          {
+            "sentence": "{ソッチョク}に意見を述べる。",
+            "answer": "率直"
+          },
+          {
+            "sentence": "はがきを{かきそん}じる。",
+            "answer": "書き損"
+          },
+          {
+            "sentence": "銀行との{タイシャク}関係。",
+            "answer": "貸借"
+          },
+          {
+            "sentence": "礼儀正しい{タイド}をとる。",
+            "answer": "態度"
+          },
+          {
+            "sentence": "郊外の{ダンチ}に住む。",
+            "answer": "団地"
+          },
+          {
+            "sentence": "母に{ことわ}って外出する。",
+            "answer": "断"
+          },
+          {
+            "sentence": "不動の地位を{きず}く。",
+            "answer": "築"
+          }
         ]
       }
     ],
     "kanjiData": [
-      {"kanji": "則", "readings": [
-        {"type": "音読み", "reading": "ソク", "example": "校則に違反する服装。", "exampleKanji": [{"kanji": "校則", "reading": "こうそく"}]}
-      ], "jukugo": [{"word": "規則", "reading": "きそく"}, {"word": "法則", "reading": "ほうそく"}, {"word": "原則", "reading": "げんそく"}, {"word": "反則", "reading": "はんそく"}]},
-      {"kanji": "測", "readings": [
-        {"type": "音読み", "reading": "ソク", "example": "体重を測定する。", "exampleKanji": [{"kanji": "測定", "reading": "そくてい"}]},
-        {"type": "訓読み", "reading": "はか（る）", "example": "全国の川の長さをはかる。", "exampleKanji": []}
-      ], "jukugo": [{"word": "測定", "reading": "そくてい"}, {"word": "観測", "reading": "かんそく"}, {"word": "推測", "reading": "すいそく"}, {"word": "予測", "reading": "よそく"}]},
-      {"kanji": "属", "readings": [
-        {"type": "音読み", "reading": "ゾク", "example": "野球部に所属する。", "exampleKanji": [{"kanji": "所属", "reading": "しょぞく"}]},
-        {"type": "訓読み", "reading": "つく", "example": "会社での配属が決まる。", "exampleKanji": []}
-      ], "jukugo": [{"word": "所属", "reading": "しょぞく"}, {"word": "付属", "reading": "ふぞく"}, {"word": "配属", "reading": "はいぞく"}, {"word": "金属", "reading": "きんぞく"}]},
-      {"kanji": "率", "readings": [
-        {"type": "音読み", "reading": "リツ・（ソツ）", "example": "仕事の効率が上がる。", "exampleKanji": [{"kanji": "効率", "reading": "こうりつ"}]},
-        {"type": "訓読み", "reading": "ひき（いる）", "example": "十万の兵士をひきいる将軍。", "exampleKanji": []}
-      ], "jukugo": [{"word": "引率", "reading": "いんそつ"}, {"word": "効率", "reading": "こうりつ"}, {"word": "確率", "reading": "かくりつ"}, {"word": "率直", "reading": "そっちょく"}]},
-      {"kanji": "損", "readings": [
-        {"type": "音読み", "reading": "ソン", "example": "百万円の損失だ。", "exampleKanji": [{"kanji": "損失", "reading": "そんしつ"}]},
-        {"type": "訓読み", "reading": "（そこ）なう・（そこ）ねる", "example": "父のきげんをそこねる。", "exampleKanji": []}
-      ], "jukugo": [{"word": "損失", "reading": "そんしつ"}, {"word": "破損", "reading": "はそん"}, {"word": "損害", "reading": "そんがい"}, {"word": "書き損", "reading": "かきそん"}]},
-      {"kanji": "貸", "readings": [
-        {"type": "音読み", "reading": "タイ", "example": "銀行との貸借関係。", "exampleKanji": [{"kanji": "貸借", "reading": "たいしゃく"}]},
-        {"type": "訓読み", "reading": "か（す）", "example": "図書館で本をかしだす。", "exampleKanji": []}
-      ], "jukugo": [{"word": "貸借", "reading": "たいしゃく"}, {"word": "貸出", "reading": "かしだし"}, {"word": "貸切", "reading": "かしきり"}, {"word": "賃貸", "reading": "ちんたい"}]},
-      {"kanji": "態", "readings": [
-        {"type": "音読み", "reading": "タイ", "example": "活動は休止の状態だ。", "exampleKanji": [{"kanji": "状態", "reading": "じょうたい"}]}
-      ], "jukugo": [{"word": "状態", "reading": "じょうたい"}, {"word": "生態", "reading": "せいたい"}, {"word": "態度", "reading": "たいど"}, {"word": "態勢", "reading": "たいせい"}]},
-      {"kanji": "団", "readings": [
-        {"type": "音読み", "reading": "ダン・（トン）", "example": "剣道の団体戦に出る。", "exampleKanji": [{"kanji": "団体", "reading": "だんたい"}]}
-      ], "jukugo": [{"word": "団体", "reading": "だんたい"}, {"word": "集団", "reading": "しゅうだん"}, {"word": "団地", "reading": "だんち"}, {"word": "団結", "reading": "だんけつ"}]},
-      {"kanji": "断", "readings": [
-        {"type": "音読み", "reading": "ダン", "example": "ロープを切断して外出する。", "exampleKanji": [{"kanji": "切断", "reading": "せつだん"}]},
-        {"type": "訓読み", "reading": "た（つ）・ことわ（る）", "example": "三十年飲み続けた酒をたつ。", "exampleKanji": []}
-      ], "jukugo": [{"word": "切断", "reading": "せつだん"}, {"word": "断言", "reading": "だんげん"}, {"word": "判断", "reading": "はんだん"}, {"word": "断念", "reading": "だんねん"}]},
-      {"kanji": "築", "readings": [
-        {"type": "音読み", "reading": "チク", "example": "住宅を建築する。", "exampleKanji": [{"kanji": "建築", "reading": "けんちく"}]},
-        {"type": "訓読み", "reading": "きず（く）", "example": "不動の地位をきずく。", "exampleKanji": []}
-      ], "jukugo": [{"word": "建築", "reading": "けんちく"}, {"word": "増築", "reading": "ぞうちく"}, {"word": "構築", "reading": "こうちく"}, {"word": "新築", "reading": "しんちく"}]}
+      {
+        "kanji": "則",
+        "readings": [
+          {
+            "type": "音読み",
+            "reading": "ソク",
+            "example": "校則に違反する服装。",
+            "exampleKanji": [
+              {
+                "kanji": "校則",
+                "reading": "こうそく"
+              }
+            ]
+          }
+        ],
+        "jukugo": [
+          {
+            "word": "規則",
+            "reading": "きそく"
+          },
+          {
+            "word": "法則",
+            "reading": "ほうそく"
+          },
+          {
+            "word": "原則",
+            "reading": "げんそく"
+          },
+          {
+            "word": "反則",
+            "reading": "はんそく"
+          }
+        ]
+      },
+      {
+        "kanji": "測",
+        "readings": [
+          {
+            "type": "音読み",
+            "reading": "ソク",
+            "example": "体重を測定する。",
+            "exampleKanji": [
+              {
+                "kanji": "測定",
+                "reading": "そくてい"
+              }
+            ]
+          },
+          {
+            "type": "訓読み",
+            "reading": "はか（る）",
+            "example": "川の長さを測る。",
+            "exampleKanji": []
+          }
+        ],
+        "jukugo": [
+          {
+            "word": "測定",
+            "reading": "そくてい"
+          },
+          {
+            "word": "観測",
+            "reading": "かんそく"
+          },
+          {
+            "word": "推測",
+            "reading": "すいそく"
+          },
+          {
+            "word": "予測",
+            "reading": "よそく"
+          }
+        ]
+      },
+      {
+        "kanji": "属",
+        "readings": [
+          {
+            "type": "音読み",
+            "reading": "ゾク",
+            "example": "野球部に所属する。",
+            "exampleKanji": [
+              {
+                "kanji": "所属",
+                "reading": "しょぞく"
+              }
+            ]
+          },
+          {
+            "type": "訓読み",
+            "reading": "つく",
+            "example": "会社での配属が決まる。",
+            "exampleKanji": []
+          }
+        ],
+        "jukugo": [
+          {
+            "word": "所属",
+            "reading": "しょぞく"
+          },
+          {
+            "word": "付属",
+            "reading": "ふぞく"
+          },
+          {
+            "word": "配属",
+            "reading": "はいぞく"
+          },
+          {
+            "word": "金属",
+            "reading": "きんぞく"
+          }
+        ]
+      },
+      {
+        "kanji": "率",
+        "readings": [
+          {
+            "type": "音読み",
+            "reading": "リツ・（ソツ）",
+            "example": "仕事の効率が上がる。",
+            "exampleKanji": [
+              {
+                "kanji": "効率",
+                "reading": "こうりつ"
+              }
+            ]
+          },
+          {
+            "type": "訓読み",
+            "reading": "ひき（いる）",
+            "example": "十万の兵士を率いる将軍。",
+            "exampleKanji": []
+          }
+        ],
+        "jukugo": [
+          {
+            "word": "引率",
+            "reading": "いんそつ"
+          },
+          {
+            "word": "効率",
+            "reading": "こうりつ"
+          },
+          {
+            "word": "確率",
+            "reading": "かくりつ"
+          },
+          {
+            "word": "率直",
+            "reading": "そっちょく"
+          }
+        ]
+      },
+      {
+        "kanji": "損",
+        "readings": [
+          {
+            "type": "音読み",
+            "reading": "ソン",
+            "example": "百万円の損失だ。",
+            "exampleKanji": [
+              {
+                "kanji": "損失",
+                "reading": "そんしつ"
+              }
+            ]
+          },
+          {
+            "type": "訓読み",
+            "reading": "（そこ）なう・（そこ）ねる",
+            "example": "父のきげんを損ねる。",
+            "exampleKanji": []
+          }
+        ],
+        "jukugo": [
+          {
+            "word": "損失",
+            "reading": "そんしつ"
+          },
+          {
+            "word": "破損",
+            "reading": "はそん"
+          },
+          {
+            "word": "損害",
+            "reading": "そんがい"
+          },
+          {
+            "word": "書き損",
+            "reading": "かきそん"
+          }
+        ]
+      },
+      {
+        "kanji": "貸",
+        "readings": [
+          {
+            "type": "音読み",
+            "reading": "タイ",
+            "example": "銀行との貸借関係。",
+            "exampleKanji": [
+              {
+                "kanji": "貸借",
+                "reading": "たいしゃく"
+              }
+            ]
+          },
+          {
+            "type": "訓読み",
+            "reading": "か（す）",
+            "example": "図書館で本を貸し出す。",
+            "exampleKanji": []
+          }
+        ],
+        "jukugo": [
+          {
+            "word": "貸借",
+            "reading": "たいしゃく"
+          },
+          {
+            "word": "貸出",
+            "reading": "かしだし"
+          },
+          {
+            "word": "貸切",
+            "reading": "かしきり"
+          },
+          {
+            "word": "賃貸",
+            "reading": "ちんたい"
+          }
+        ]
+      },
+      {
+        "kanji": "態",
+        "readings": [
+          {
+            "type": "音読み",
+            "reading": "タイ",
+            "example": "活動は休止の状態だ。",
+            "exampleKanji": [
+              {
+                "kanji": "状態",
+                "reading": "じょうたい"
+              }
+            ]
+          }
+        ],
+        "jukugo": [
+          {
+            "word": "状態",
+            "reading": "じょうたい"
+          },
+          {
+            "word": "生態",
+            "reading": "せいたい"
+          },
+          {
+            "word": "態度",
+            "reading": "たいど"
+          },
+          {
+            "word": "態勢",
+            "reading": "たいせい"
+          }
+        ]
+      },
+      {
+        "kanji": "団",
+        "readings": [
+          {
+            "type": "音読み",
+            "reading": "ダン・（トン）",
+            "example": "剣道の団体戦に出る。",
+            "exampleKanji": [
+              {
+                "kanji": "団体",
+                "reading": "だんたい"
+              }
+            ]
+          }
+        ],
+        "jukugo": [
+          {
+            "word": "団体",
+            "reading": "だんたい"
+          },
+          {
+            "word": "集団",
+            "reading": "しゅうだん"
+          },
+          {
+            "word": "団地",
+            "reading": "だんち"
+          },
+          {
+            "word": "団結",
+            "reading": "だんけつ"
+          }
+        ]
+      },
+      {
+        "kanji": "断",
+        "readings": [
+          {
+            "type": "音読み",
+            "reading": "ダン",
+            "example": "ロープを切断して外出する。",
+            "exampleKanji": [
+              {
+                "kanji": "切断",
+                "reading": "せつだん"
+              }
+            ]
+          },
+          {
+            "type": "訓読み",
+            "reading": "た（つ）・ことわ（る）",
+            "example": "三十年飲み続けた酒を断つ。",
+            "exampleKanji": []
+          }
+        ],
+        "jukugo": [
+          {
+            "word": "切断",
+            "reading": "せつだん"
+          },
+          {
+            "word": "断言",
+            "reading": "だんげん"
+          },
+          {
+            "word": "判断",
+            "reading": "はんだん"
+          },
+          {
+            "word": "断念",
+            "reading": "だんねん"
+          }
+        ]
+      },
+      {
+        "kanji": "築",
+        "readings": [
+          {
+            "type": "音読み",
+            "reading": "チク",
+            "example": "住宅を建築する。",
+            "exampleKanji": [
+              {
+                "kanji": "建築",
+                "reading": "けんちく"
+              }
+            ]
+          },
+          {
+            "type": "訓読み",
+            "reading": "きず（く）",
+            "example": "不動の地位を築く。",
+            "exampleKanji": []
+          }
+        ],
+        "jukugo": [
+          {
+            "word": "建築",
+            "reading": "けんちく"
+          },
+          {
+            "word": "増築",
+            "reading": "ぞうちく"
+          },
+          {
+            "word": "構築",
+            "reading": "こうちく"
+          },
+          {
+            "word": "新築",
+            "reading": "しんちく"
+          }
+        ]
+      }
     ]
-  }
-  ,
+  },
   {
     "id": 6,
     "title": "第6回",
@@ -820,102 +2376,607 @@ var BUILTIN = [
       {
         "level": 1,
         "questions": [
-          {"sentence": "{トクテン}の合計を競う。", "answer": "得点"},
-          {"sentence": "むりな運動は体に{ドク}だ。", "answer": "毒"},
-          {"sentence": "{ドクジ}のやり方を考え出す。", "answer": "独自"},
-          {"sentence": "仕事を{まか}せる。", "answer": "任"},
-          {"sentence": "マッチが{ネンショウ}する。", "answer": "燃焼"},
-          {"sentence": "薬の{コウノウ}を生かした仕事。", "answer": "効能"},
-          {"sentence": "古いしきたりを{ダハ}する。", "answer": "打破"},
-          {"sentence": "{ハンニン}をつかまえる。", "answer": "犯人"},
-          {"sentence": "身元が{ハンメイ}した。", "answer": "判明"},
-          {"sentence": "図工で{ハンガ}を刷る。", "answer": "版画"}
+          {
+            "sentence": "{トクテン}の合計を競う。",
+            "answer": "得点"
+          },
+          {
+            "sentence": "むりな運動は体に{ドク}だ。",
+            "answer": "毒"
+          },
+          {
+            "sentence": "{ドクジ}のやり方を考え出す。",
+            "answer": "独自"
+          },
+          {
+            "sentence": "仕事を{まか}せる。",
+            "answer": "任"
+          },
+          {
+            "sentence": "マッチが{ネンショウ}する。",
+            "answer": "燃焼"
+          },
+          {
+            "sentence": "薬の{コウノウ}を生かした仕事。",
+            "answer": "効能"
+          },
+          {
+            "sentence": "古いしきたりを{ダハ}する。",
+            "answer": "打破"
+          },
+          {
+            "sentence": "{ハンニン}をつかまえる。",
+            "answer": "犯人"
+          },
+          {
+            "sentence": "身元が{ハンメイ}した。",
+            "answer": "判明"
+          },
+          {
+            "sentence": "図工で{ハンガ}を刷る。",
+            "answer": "版画"
+          }
         ]
       },
       {
         "level": 2,
         "questions": [
-          {"sentence": "算数と国語が{トクイ}だ。", "answer": "得意"},
-          {"sentence": "妹に{キノドク}なことをした。", "answer": "気の毒"},
-          {"sentence": "発表会で{ドクショウ}する。", "answer": "独唱"},
-          {"sentence": "重い{セキニン}を負う。", "answer": "責任"},
-          {"sentence": "車の{ネンリョウ}に軽油を使う。", "answer": "燃料"},
-          {"sentence": "音楽の{サイノウ}がある。", "answer": "才能"},
-          {"sentence": "長編小説を{ドクハ}する。", "answer": "読破"},
-          {"sentence": "{ハンコウ}現場を目撃する。", "answer": "犯行"},
-          {"sentence": "一着を写真で{ハンテイ}する。", "answer": "判定"},
-          {"sentence": "歌集を{シュッパン}する。", "answer": "出版"}
+          {
+            "sentence": "算数と国語が{トクイ}だ。",
+            "answer": "得意"
+          },
+          {
+            "sentence": "妹に{キノドク}なことをした。",
+            "answer": "気の毒"
+          },
+          {
+            "sentence": "発表会で{ドクショウ}する。",
+            "answer": "独唱"
+          },
+          {
+            "sentence": "重い{セキニン}を負う。",
+            "answer": "責任"
+          },
+          {
+            "sentence": "車の{ネンリョウ}に軽油を使う。",
+            "answer": "燃料"
+          },
+          {
+            "sentence": "音楽の{サイノウ}がある。",
+            "answer": "才能"
+          },
+          {
+            "sentence": "長編小説を{ドクハ}する。",
+            "answer": "読破"
+          },
+          {
+            "sentence": "{ハンコウ}現場を目撃する。",
+            "answer": "犯行"
+          },
+          {
+            "sentence": "一着を写真で{ハンテイ}する。",
+            "answer": "判定"
+          },
+          {
+            "sentence": "歌集を{シュッパン}する。",
+            "answer": "出版"
+          }
         ]
       },
       {
         "level": 3,
         "questions": [
-          {"sentence": "新技術を{シュウトク}する。", "answer": "習得"},
-          {"sentence": "傷口を{ショウドク}する。", "answer": "消毒"},
-          {"sentence": "{ドクガク}で勉強する。", "answer": "独学"},
-          {"sentence": "会長の{ニンキ}は一年です。", "answer": "任期"},
-          {"sentence": "{フネン}物を分別する。", "answer": "不燃"},
-          {"sentence": "今では宇宙旅行も{カノウ}だ。", "answer": "可能"},
-          {"sentence": "{ハカク}の値段におどろく。", "answer": "破格"},
-          {"sentence": "罪を{おか}す。", "answer": "犯"},
-          {"sentence": "裁判の{けつろん}を出す。", "answer": "判決"},
-          {"sentence": "教科書の{ズハン}を見る。", "answer": "図版"}
+          {
+            "sentence": "新技術を{シュウトク}する。",
+            "answer": "習得"
+          },
+          {
+            "sentence": "傷口を{ショウドク}する。",
+            "answer": "消毒"
+          },
+          {
+            "sentence": "{ドクガク}で勉強する。",
+            "answer": "独学"
+          },
+          {
+            "sentence": "会長の{ニンキ}は一年です。",
+            "answer": "任期"
+          },
+          {
+            "sentence": "{フネン}物を分別する。",
+            "answer": "不燃"
+          },
+          {
+            "sentence": "今では宇宙旅行も{カノウ}だ。",
+            "answer": "可能"
+          },
+          {
+            "sentence": "{ハカク}の値段におどろく。",
+            "answer": "破格"
+          },
+          {
+            "sentence": "罪を{おか}す。",
+            "answer": "犯"
+          },
+          {
+            "sentence": "裁判の{けつろん}を出す。",
+            "answer": "判決"
+          },
+          {
+            "sentence": "教科書の{ズハン}を見る。",
+            "answer": "図版"
+          }
         ]
       },
       {
         "level": 4,
         "questions": [
-          {"sentence": "先生の信用を{え}る。", "answer": "得"},
-          {"sentence": "気の{どく}なことを言う。", "answer": "毒"},
-          {"sentence": "親から{ひとりだ}ちする。", "answer": "独"},
-          {"sentence": "大臣が{ニンメイ}される。", "answer": "任命"},
-          {"sentence": "たきぎを{も}やす。", "answer": "燃"},
-          {"sentence": "{ノウドウ}的にはたらきかける。", "answer": "能動"},
-          {"sentence": "相手と{ろんぱ}する。", "answer": "論破"},
-          {"sentence": "{キョウハン}者をかばう。", "answer": "共犯"},
-          {"sentence": "書類に{ハン}をおす。", "answer": "判"},
-          {"sentence": "漱石の貴重な{ショハン}本。", "answer": "初版"}
+          {
+            "sentence": "先生の信用を{え}る。",
+            "answer": "得"
+          },
+          {
+            "sentence": "気の{どく}なことを言う。",
+            "answer": "毒"
+          },
+          {
+            "sentence": "親から{ひとりだ}ちする。",
+            "answer": "独"
+          },
+          {
+            "sentence": "大臣が{ニンメイ}される。",
+            "answer": "任命"
+          },
+          {
+            "sentence": "たきぎを{も}やす。",
+            "answer": "燃"
+          },
+          {
+            "sentence": "{ノウドウ}的にはたらきかける。",
+            "answer": "能動"
+          },
+          {
+            "sentence": "相手と{ろんぱ}する。",
+            "answer": "論破"
+          },
+          {
+            "sentence": "{キョウハン}者をかばう。",
+            "answer": "共犯"
+          },
+          {
+            "sentence": "書類に{ハン}をおす。",
+            "answer": "判"
+          },
+          {
+            "sentence": "漱石の貴重な{ショハン}本。",
+            "answer": "初版"
+          }
         ]
       }
     ],
     "kanjiData": [
-      {"kanji": "得", "readings": [
-        {"type": "音読み", "reading": "トク", "example": "得点の合計を競う。", "exampleKanji": [{"kanji": "得点", "reading": "とくてん"}]},
-        {"type": "訓読み", "reading": "え（る）・う（る）", "example": "先生の信用を得る。", "exampleKanji": []}
-      ], "jukugo": [{"word": "得点", "reading": "とくてん"}, {"word": "得意", "reading": "とくい"}, {"word": "習得", "reading": "しゅうとく"}, {"word": "所得", "reading": "しょとく"}, {"word": "体得", "reading": "たいとく"}]},
-      {"kanji": "毒", "readings": [
-        {"type": "音読み", "reading": "ドク", "example": "傷口を消毒する。", "exampleKanji": [{"kanji": "消毒", "reading": "しょうどく"}]}
-      ], "jukugo": [{"word": "毒薬", "reading": "どくやく"}, {"word": "消毒", "reading": "しょうどく"}, {"word": "中毒", "reading": "ちゅうどく"}, {"word": "気の毒", "reading": "きのどく"}, {"word": "害毒", "reading": "がいどく"}]},
-      {"kanji": "独", "readings": [
-        {"type": "音読み", "reading": "ドク", "example": "独学で勉強する。", "exampleKanji": [{"kanji": "独学", "reading": "どくがく"}]},
-        {"type": "訓読み", "reading": "ひと（り）", "example": "親からひとりだちする。", "exampleKanji": []}
-      ], "jukugo": [{"word": "独自", "reading": "どくじ"}, {"word": "独唱", "reading": "どくしょう"}, {"word": "独学", "reading": "どくがく"}, {"word": "独立", "reading": "どくりつ"}, {"word": "単独", "reading": "たんどく"}]},
-      {"kanji": "任", "readings": [
-        {"type": "音読み", "reading": "ニン", "example": "大臣が任命される。", "exampleKanji": [{"kanji": "任命", "reading": "にんめい"}]},
-        {"type": "訓読み", "reading": "まか（せる）・まか（す）", "example": "仕事をまかせる。", "exampleKanji": []}
-      ], "jukugo": [{"word": "任務", "reading": "にんむ"}, {"word": "任期", "reading": "にんき"}, {"word": "任命", "reading": "にんめい"}, {"word": "委任", "reading": "いにん"}, {"word": "責任", "reading": "せきにん"}]},
-      {"kanji": "燃", "readings": [
-        {"type": "音読み", "reading": "ネン", "example": "マッチが燃焼する。", "exampleKanji": [{"kanji": "燃焼", "reading": "ねんしょう"}]},
-        {"type": "訓読み", "reading": "も（える）・も（やす）・も（す）", "example": "たきぎをもやす。", "exampleKanji": []}
-      ], "jukugo": [{"word": "燃焼", "reading": "ねんしょう"}, {"word": "燃料", "reading": "ねんりょう"}, {"word": "燃費", "reading": "ねんぴ"}, {"word": "不燃", "reading": "ふねん"}, {"word": "可燃", "reading": "かねん"}]},
-      {"kanji": "能", "readings": [
-        {"type": "音読み", "reading": "ノウ", "example": "音楽の才能がある。", "exampleKanji": [{"kanji": "才能", "reading": "さいのう"}]}
-      ], "jukugo": [{"word": "才能", "reading": "さいのう"}, {"word": "効能", "reading": "こうのう"}, {"word": "可能", "reading": "かのう"}, {"word": "能力", "reading": "のうりょく"}, {"word": "能動", "reading": "のうどう"}]},
-      {"kanji": "破", "readings": [
-        {"type": "音読み", "reading": "ハ", "example": "古いしきたりを打破する。", "exampleKanji": [{"kanji": "打破", "reading": "だは"}]},
-        {"type": "訓読み", "reading": "やぶ（る）・やぶ（れる）", "example": "ズボンのすそがやぶれる。", "exampleKanji": []}
-      ], "jukugo": [{"word": "打破", "reading": "だは"}, {"word": "読破", "reading": "どくは"}, {"word": "破格", "reading": "はかく"}, {"word": "論破", "reading": "ろんぱ"}, {"word": "大破", "reading": "たいは"}]},
-      {"kanji": "犯", "readings": [
-        {"type": "音読み", "reading": "ハン", "example": "犯人をつかまえる。", "exampleKanji": [{"kanji": "犯人", "reading": "はんにん"}]},
-        {"type": "訓読み", "reading": "（おか）す", "example": "罪をおかす。", "exampleKanji": []}
-      ], "jukugo": [{"word": "犯人", "reading": "はんにん"}, {"word": "犯行", "reading": "はんこう"}, {"word": "犯罪", "reading": "はんざい"}, {"word": "共犯", "reading": "きょうはん"}, {"word": "再犯", "reading": "さいはん"}]},
-      {"kanji": "判", "readings": [
-        {"type": "音読み", "reading": "ハン・バン", "example": "身元が判明した。", "exampleKanji": [{"kanji": "判明", "reading": "はんめい"}]},
-        {"type": "訓読み", "reading": "わか（る）", "example": "分からなかったものが明らかになること。", "exampleKanji": []}
-      ], "jukugo": [{"word": "判明", "reading": "はんめい"}, {"word": "判定", "reading": "はんてい"}, {"word": "判決", "reading": "はんけつ"}, {"word": "裁判", "reading": "さいばん"}, {"word": "判断", "reading": "はんだん"}]},
-      {"kanji": "版", "readings": [
-        {"type": "音読み", "reading": "ハン", "example": "歌集を出版する。", "exampleKanji": [{"kanji": "出版", "reading": "しゅっぱん"}]}
-      ], "jukugo": [{"word": "版画", "reading": "はんが"}, {"word": "出版", "reading": "しゅっぱん"}, {"word": "図版", "reading": "ずはん"}, {"word": "初版", "reading": "しょはん"}, {"word": "印刷版", "reading": "いんさつばん"}]}
+      {
+        "kanji": "得",
+        "readings": [
+          {
+            "type": "音読み",
+            "reading": "トク",
+            "example": "得点の合計を競う。",
+            "exampleKanji": [
+              {
+                "kanji": "得点",
+                "reading": "とくてん"
+              }
+            ]
+          },
+          {
+            "type": "訓読み",
+            "reading": "え（る）・う（る）",
+            "example": "先生の信用を得る。",
+            "exampleKanji": []
+          }
+        ],
+        "jukugo": [
+          {
+            "word": "得点",
+            "reading": "とくてん"
+          },
+          {
+            "word": "得意",
+            "reading": "とくい"
+          },
+          {
+            "word": "習得",
+            "reading": "しゅうとく"
+          },
+          {
+            "word": "所得",
+            "reading": "しょとく"
+          },
+          {
+            "word": "体得",
+            "reading": "たいとく"
+          }
+        ]
+      },
+      {
+        "kanji": "毒",
+        "readings": [
+          {
+            "type": "音読み",
+            "reading": "ドク",
+            "example": "傷口を消毒する。",
+            "exampleKanji": [
+              {
+                "kanji": "消毒",
+                "reading": "しょうどく"
+              }
+            ]
+          }
+        ],
+        "jukugo": [
+          {
+            "word": "毒薬",
+            "reading": "どくやく"
+          },
+          {
+            "word": "消毒",
+            "reading": "しょうどく"
+          },
+          {
+            "word": "中毒",
+            "reading": "ちゅうどく"
+          },
+          {
+            "word": "気の毒",
+            "reading": "きのどく"
+          },
+          {
+            "word": "害毒",
+            "reading": "がいどく"
+          }
+        ]
+      },
+      {
+        "kanji": "独",
+        "readings": [
+          {
+            "type": "音読み",
+            "reading": "ドク",
+            "example": "独学で勉強する。",
+            "exampleKanji": [
+              {
+                "kanji": "独学",
+                "reading": "どくがく"
+              }
+            ]
+          },
+          {
+            "type": "訓読み",
+            "reading": "ひと（り）",
+            "example": "親から独り立ちする。",
+            "exampleKanji": []
+          }
+        ],
+        "jukugo": [
+          {
+            "word": "独自",
+            "reading": "どくじ"
+          },
+          {
+            "word": "独唱",
+            "reading": "どくしょう"
+          },
+          {
+            "word": "独学",
+            "reading": "どくがく"
+          },
+          {
+            "word": "独立",
+            "reading": "どくりつ"
+          },
+          {
+            "word": "単独",
+            "reading": "たんどく"
+          }
+        ]
+      },
+      {
+        "kanji": "任",
+        "readings": [
+          {
+            "type": "音読み",
+            "reading": "ニン",
+            "example": "大臣が任命される。",
+            "exampleKanji": [
+              {
+                "kanji": "任命",
+                "reading": "にんめい"
+              }
+            ]
+          },
+          {
+            "type": "訓読み",
+            "reading": "まか（せる）・まか（す）",
+            "example": "仕事を任せる。",
+            "exampleKanji": []
+          }
+        ],
+        "jukugo": [
+          {
+            "word": "任務",
+            "reading": "にんむ"
+          },
+          {
+            "word": "任期",
+            "reading": "にんき"
+          },
+          {
+            "word": "任命",
+            "reading": "にんめい"
+          },
+          {
+            "word": "委任",
+            "reading": "いにん"
+          },
+          {
+            "word": "責任",
+            "reading": "せきにん"
+          }
+        ]
+      },
+      {
+        "kanji": "燃",
+        "readings": [
+          {
+            "type": "音読み",
+            "reading": "ネン",
+            "example": "マッチが燃焼する。",
+            "exampleKanji": [
+              {
+                "kanji": "燃焼",
+                "reading": "ねんしょう"
+              }
+            ]
+          },
+          {
+            "type": "訓読み",
+            "reading": "も（える）・も（やす）・も（す）",
+            "example": "たきぎを燃やす。",
+            "exampleKanji": []
+          }
+        ],
+        "jukugo": [
+          {
+            "word": "燃焼",
+            "reading": "ねんしょう"
+          },
+          {
+            "word": "燃料",
+            "reading": "ねんりょう"
+          },
+          {
+            "word": "燃費",
+            "reading": "ねんぴ"
+          },
+          {
+            "word": "不燃",
+            "reading": "ふねん"
+          },
+          {
+            "word": "可燃",
+            "reading": "かねん"
+          }
+        ]
+      },
+      {
+        "kanji": "能",
+        "readings": [
+          {
+            "type": "音読み",
+            "reading": "ノウ",
+            "example": "音楽の才能がある。",
+            "exampleKanji": [
+              {
+                "kanji": "才能",
+                "reading": "さいのう"
+              }
+            ]
+          }
+        ],
+        "jukugo": [
+          {
+            "word": "才能",
+            "reading": "さいのう"
+          },
+          {
+            "word": "効能",
+            "reading": "こうのう"
+          },
+          {
+            "word": "可能",
+            "reading": "かのう"
+          },
+          {
+            "word": "能力",
+            "reading": "のうりょく"
+          },
+          {
+            "word": "能動",
+            "reading": "のうどう"
+          }
+        ]
+      },
+      {
+        "kanji": "破",
+        "readings": [
+          {
+            "type": "音読み",
+            "reading": "ハ",
+            "example": "古いしきたりを打破する。",
+            "exampleKanji": [
+              {
+                "kanji": "打破",
+                "reading": "だは"
+              }
+            ]
+          },
+          {
+            "type": "訓読み",
+            "reading": "やぶ（る）・やぶ（れる）",
+            "example": "ズボンのすそが破れる。",
+            "exampleKanji": []
+          }
+        ],
+        "jukugo": [
+          {
+            "word": "打破",
+            "reading": "だは"
+          },
+          {
+            "word": "読破",
+            "reading": "どくは"
+          },
+          {
+            "word": "破格",
+            "reading": "はかく"
+          },
+          {
+            "word": "論破",
+            "reading": "ろんぱ"
+          },
+          {
+            "word": "大破",
+            "reading": "たいは"
+          }
+        ]
+      },
+      {
+        "kanji": "犯",
+        "readings": [
+          {
+            "type": "音読み",
+            "reading": "ハン",
+            "example": "犯人をつかまえる。",
+            "exampleKanji": [
+              {
+                "kanji": "犯人",
+                "reading": "はんにん"
+              }
+            ]
+          },
+          {
+            "type": "訓読み",
+            "reading": "（おか）す",
+            "example": "罪を犯す。",
+            "exampleKanji": []
+          }
+        ],
+        "jukugo": [
+          {
+            "word": "犯人",
+            "reading": "はんにん"
+          },
+          {
+            "word": "犯行",
+            "reading": "はんこう"
+          },
+          {
+            "word": "犯罪",
+            "reading": "はんざい"
+          },
+          {
+            "word": "共犯",
+            "reading": "きょうはん"
+          },
+          {
+            "word": "再犯",
+            "reading": "さいはん"
+          }
+        ]
+      },
+      {
+        "kanji": "判",
+        "readings": [
+          {
+            "type": "音読み",
+            "reading": "ハン・バン",
+            "example": "身元が判明した。",
+            "exampleKanji": [
+              {
+                "kanji": "判明",
+                "reading": "はんめい"
+              }
+            ]
+          },
+          {
+            "type": "訓読み",
+            "reading": "わか（る）",
+            "example": "身元が判る。",
+            "exampleKanji": []
+          }
+        ],
+        "jukugo": [
+          {
+            "word": "判明",
+            "reading": "はんめい"
+          },
+          {
+            "word": "判定",
+            "reading": "はんてい"
+          },
+          {
+            "word": "判決",
+            "reading": "はんけつ"
+          },
+          {
+            "word": "裁判",
+            "reading": "さいばん"
+          },
+          {
+            "word": "判断",
+            "reading": "はんだん"
+          }
+        ]
+      },
+      {
+        "kanji": "版",
+        "readings": [
+          {
+            "type": "音読み",
+            "reading": "ハン",
+            "example": "歌集を出版する。",
+            "exampleKanji": [
+              {
+                "kanji": "出版",
+                "reading": "しゅっぱん"
+              }
+            ]
+          }
+        ],
+        "jukugo": [
+          {
+            "word": "版画",
+            "reading": "はんが"
+          },
+          {
+            "word": "出版",
+            "reading": "しゅっぱん"
+          },
+          {
+            "word": "図版",
+            "reading": "ずはん"
+          },
+          {
+            "word": "初版",
+            "reading": "しょはん"
+          },
+          {
+            "word": "印刷版",
+            "reading": "いんさつばん"
+          }
+        ]
+      }
     ]
   }
 ];
