@@ -249,7 +249,7 @@ var BUILTIN = [
             "answer": "国政"
           },
           {
-            "sentence": "強い{ジョウリョク}の台風。",
+            "sentence": "国際{ジョウセイ}を調べる。",
             "answer": "情勢"
           },
           {
@@ -790,7 +790,7 @@ var BUILTIN = [
             "answer": "調停"
           },
           {
-            "sentence": "てさげぶくろに{い}れる。",
+            "sentence": "て{さ}げぶくろにいれる。",
             "answer": "提"
           },
           {
@@ -839,7 +839,7 @@ var BUILTIN = [
             "answer": "提起"
           },
           {
-            "sentence": "悪さをするにも{ホド}がある。",
+            "sentence": "悪さをするにも{ほど}がある。",
             "answer": "程"
           },
           {
@@ -1916,7 +1916,7 @@ var BUILTIN = [
             "answer": "破損"
           },
           {
-            "sentence": "お金の{かしき}りバスで旅行する。",
+            "sentence": "{かしき}りバスで旅行する。",
             "answer": "貸切"
           },
           {
@@ -2381,7 +2381,7 @@ var BUILTIN = [
             "answer": "得点"
           },
           {
-            "sentence": "むりな運動は体に{ドク}だ。",
+            "sentence": "むりな運動は体に{どく}だ。",
             "answer": "毒"
           },
           {
@@ -2499,7 +2499,7 @@ var BUILTIN = [
             "answer": "犯"
           },
           {
-            "sentence": "裁判の{けつろん}を出す。",
+            "sentence": "裁判の{はんけつ}を出す。",
             "answer": "判決"
           },
           {
@@ -2544,7 +2544,7 @@ var BUILTIN = [
             "answer": "共犯"
           },
           {
-            "sentence": "書類に{ハン}をおす。",
+            "sentence": "書類に{はん}をおす。",
             "answer": "判"
           },
           {
@@ -3058,7 +3058,7 @@ function render() {
     };
     hdr.insertBefore(b, hdr.querySelector("h1"));
   }
-  var pages = { home: pageHome, add: pageAdd, drill: pageDrill, kanji: pageKanji, practice: pagePractice, history: pageHistory, shuffleSetup: pageShuffleSetup };
+  var pages = { home: pageHome, add: pageAdd, drill: pageDrill, kanji: pageKanji, practice: pagePractice, history: pageHistory, shuffleSetup: pageShuffleSetup, rankDetail: pageRankDetail };
   if (pages[S.screen]) pages[S.screen]();
 }
 
@@ -3215,6 +3215,23 @@ function pageHome() {
   shuffleBtn.onclick = function() { S.screen = "shuffleSetup"; render(); };
   div.appendChild(shuffleBtn);
 
+  // ===== 漢字道場バー =====
+  var homeStats = getShuffleStats("all");
+  var homeRank  = getShuffleRank(homeStats.count || 0);
+  var homeNext  = getNextRank(homeStats.count || 0);
+  var rankBar   = el("div");
+  rankBar.style.cssText = "margin-top:12px;background:linear-gradient(135deg,#1e1b4b,#312e81);border-radius:16px;padding:14px 18px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;";
+  rankBar.innerHTML = "<div style='display:flex;align-items:center;gap:10px;'>"
+    + "<div style='font-size:30px;'>" + homeRank.emoji + "</div>"
+    + "<div><div style='font-size:11px;color:#a5b4fc;font-weight:700;letter-spacing:1px;'>🔀 漢字道場</div>"
+    + "<div style='font-size:17px;font-weight:900;color:white;'>" + homeRank.label + "</div>"
+    + "<div style='font-size:11px;color:#a5b4fc;'>取り組み " + (homeStats.count||0) + "かい</div></div></div>"
+    + "<div style='text-align:right;font-size:11px;color:#a5b4fc;'>"
+    + (homeNext ? "格上げまであと<br><b style='color:#fde68a;font-size:16px;'>" + (homeNext.min - (homeStats.count||0)) + "</b>かい" : "<b style='color:#fde68a;'>最高位！</b>")
+    + "</div>";
+  rankBar.onclick = function() { S.screen = "rankDetail"; render(); };
+  div.appendChild(rankBar);
+
   var addBtn = el("button","btn-red");
   addBtn.innerHTML = `<span style="font-size:22px;">＋</span> 新しい回を追加（JSONファイル）`;
   addBtn.style.display = "none";
@@ -3302,6 +3319,65 @@ function pageAdd() {
   app.appendChild(div);
 }
 
+var SHUFFLE_RANKS = [
+  { min:0,   label:"見習い", emoji:"📝", color:"#9ca3af" },
+  { min:3,   label:"十段",   emoji:"🥉", color:"#92400e" },
+  { min:6,   label:"九段",   emoji:"🥉", color:"#92400e" },
+  { min:9,   label:"八段",   emoji:"🥉", color:"#92400e" },
+  { min:12,  label:"七段",   emoji:"🥈", color:"#6b7280" },
+  { min:15,  label:"六段",   emoji:"🥈", color:"#6b7280" },
+  { min:18,  label:"五段",   emoji:"🥈", color:"#6b7280" },
+  { min:21,  label:"四段",   emoji:"🥇", color:"#d97706" },
+  { min:24,  label:"三段",   emoji:"🥇", color:"#d97706" },
+  { min:27,  label:"二段",   emoji:"🥇", color:"#d97706" },
+  { min:30,  label:"初段",   emoji:"🔥", color:"#ef4444" },
+  { min:35,  label:"師範代", emoji:"🔥", color:"#ef4444" },
+  { min:42,  label:"師範",   emoji:"⭐", color:"#8b5cf6" },
+  { min:50,  label:"漢字王", emoji:"👑", color:"#f59e0b" },
+];
+
+var SK_SHUFFLE = "kanji_shuffle_v1";
+
+function shuffleKey(key) {
+  // 日本語タイトルを安全なキーに変換
+  if (!key || key === "all") return SK_SHUFFLE + "_all";
+  // "第1回"→"s1", "第2回"→"s2" など
+  var m = key.match(/(\d+)/);
+  return SK_SHUFFLE + "_s" + (m ? m[1] : key.replace(/[^a-zA-Z0-9]/g, ""));
+}
+
+function getShuffleStats(key) {
+  // key: "all" or 回タイトル("第1回"など)
+  var k = shuffleKey(key);
+  var raw = LS.getItem(k);
+  if (!raw) return { total: 0, correct: 0, count: 0 };
+  try {
+    var d = JSON.parse(raw);
+    if (!d.count) d.count = 0;
+    return d;
+  } catch(e) { return { total: 0, correct: 0, count: 0 }; }
+}
+
+function saveShuffleStats(key, stats) {
+  var k = shuffleKey(key);
+  LS.setItem(k, JSON.stringify(stats));
+}
+
+function getShuffleRank(count) {
+  var rank = SHUFFLE_RANKS[0];
+  for (var i = 0; i < SHUFFLE_RANKS.length; i++) {
+    if (count >= SHUFFLE_RANKS[i].min) rank = SHUFFLE_RANKS[i];
+  }
+  return rank;
+}
+
+function getNextRank(count) {
+  for (var i = 0; i < SHUFFLE_RANKS.length; i++) {
+    if (SHUFFLE_RANKS[i].min > count) return SHUFFLE_RANKS[i];
+  }
+  return null;
+}
+
 var LC = [
   { id:1, title:"レベル1 ⭐",      label:"やさしい",          color:"#22c55e", emoji:"🌱" },
   { id:2, title:"レベル2 ⭐⭐",    label:"ふつう",            color:"#3b82f6", emoji:"📘" },
@@ -3371,22 +3447,125 @@ function makeAnimalCard(sessionTitle, mini) {
     + '</div>';
 }
 
+function pageRankDetail() {
+  var div = el("div","slide-up");
+
+  var h2 = el("div");
+  h2.style.cssText = "font-size:18px;font-weight:900;color:#1e1b4b;margin-bottom:4px;";
+  h2.textContent = "⚔️ 漢字道場";
+  var sub = el("div");
+  sub.style.cssText = "font-size:13px;color:#9ca3af;margin-bottom:16px;";
+  sub.textContent = "まとめ問題・シャッフル問題の取り組み記録";
+  div.appendChild(h2);
+  div.appendChild(sub);
+
+  // 全体段位カード
+  var allStats = getShuffleStats("all");
+  var allRank  = getShuffleRank(allStats.count || 0);
+  var allNext  = getNextRank(allStats.count || 0);
+  var allCard  = el("div");
+  allCard.style.cssText = "background:linear-gradient(135deg,#1e1b4b,#312e81);border-radius:20px;padding:20px;margin-bottom:16px;";
+  allCard.innerHTML = "<div style='font-size:11px;color:#a5b4fc;font-weight:700;letter-spacing:1px;margin-bottom:12px;'>🌐 ぜんたい</div>"
+    + "<div style='display:flex;align-items:center;gap:14px;margin-bottom:12px;'>"
+    + "<div style='font-size:52px;'>" + allRank.emoji + "</div>"
+    + "<div><div style='font-size:24px;font-weight:900;color:white;'>" + allRank.label + "</div>"
+    + "<div style='font-size:13px;color:#a5b4fc;'>シャッフル全体 取り組み " + (allStats.count||0) + "かい</div></div></div>"
+    + (allNext
+      ? "<div style='background:rgba(255,255,255,0.1);border-radius:10px;padding:10px 14px;display:flex;align-items:center;justify-content:space-between;'>"
+        + "<div style='font-size:12px;color:#c7d2fe;'>次の段位「" + allNext.label + "」</div>"
+        + "<div style='font-size:13px;font-weight:900;color:#fde68a;'>格上げまであと " + (allNext.min - (allStats.count||0)) + "かい</div></div>"
+      : "<div style='font-size:14px;color:#fde68a;font-weight:900;text-align:center;'>👑 最高位！すごい！</div>");
+  div.appendChild(allCard);
+
+  // 段位一覧表
+  var tableLabel = el("div");
+  tableLabel.style.cssText = "font-size:13px;font-weight:800;color:#92400e;margin-bottom:8px;letter-spacing:1px;";
+  tableLabel.textContent = "📊 段位一覧";
+  div.appendChild(tableLabel);
+
+  var table = el("div");
+  table.style.cssText = "background:white;border-radius:16px;overflow:hidden;margin-bottom:16px;border:1.5px solid #e5e7eb;";
+  SHUFFLE_RANKS.forEach(function(rank, i) {
+    var isCurrent = allRank.label === rank.label;
+    var isPast = (allStats.count||0) >= rank.min;
+    var row = el("div");
+    row.style.cssText = "display:flex;align-items:center;padding:10px 14px;border-bottom:1px solid #f3f4f6;"
+      + (isCurrent ? "background:#ede9fe;" : "");
+    row.innerHTML = "<div style='font-size:20px;margin-right:10px;opacity:" + (isPast ? "1" : "0.3") + ";'>" + rank.emoji + "</div>"
+      + "<div style='flex:1;'><div style='font-size:13px;font-weight:" + (isCurrent ? "900" : "600") + ";color:" + (isCurrent ? "#4338ca" : (isPast ? "#1e1e1e" : "#9ca3af")) + ";'>" + rank.label + (isCurrent ? " ← いまここ" : "") + "</div>"
+      + "<div style='font-size:10px;color:#9ca3af;'>" + rank.min + "かいから</div></div>"
+      + (isCurrent ? "<div style='font-size=11px;font-weight:800;color:#4338ca;'>▶</div>" : "");
+    table.appendChild(row);
+  });
+  div.appendChild(table);
+
+  // 各回の取り組み
+  var perLabel = el("div");
+  perLabel.style.cssText = "font-size:13px;font-weight:800;color:#92400e;margin-bottom:8px;letter-spacing:1px;";
+  perLabel.textContent = "📚 各回の取り組み";
+  div.appendChild(perLabel);
+
+  var perGrid = el("div");
+  perGrid.style.cssText = "display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:16px;";
+    // シャッフル全体枠（先頭に表示）
+  var allSc = el("div");
+  allSc.style.cssText = "background:linear-gradient(135deg,#1e1b4b,#312e81);border-radius:14px;padding:12px;grid-column:1/-1;";
+  allSc.innerHTML = "<div style='font-size:12px;font-weight:800;color:#a5b4fc;margin-bottom:6px;'>🌐 シャッフル全体</div>"
+    + "<div style='display:flex;align-items:center;gap:8px;'>"
+    + "<div style='font-size:28px;'>" + allRank.emoji + "</div>"
+    + "<div><div style='font-size:14px;font-weight:900;color:white;'>" + allRank.label + "</div>"
+    + "<div style='font-size:11px;color:#a5b4fc;'>取り組み " + (allStats.count||0) + "回</div></div></div>";
+  perGrid.appendChild(allSc);
+
+  S.sessions.forEach(function(sess) {
+    var sStats = getShuffleStats(sess.title);
+    var sRank  = getShuffleRank(sStats.count || 0);
+    var sc = el("div");
+    sc.style.cssText = "background:white;border:1.5px solid #e5e7eb;border-radius:14px;padding:12px;";
+    sc.innerHTML = "<div style='font-size:12px;font-weight:800;color:#92400e;margin-bottom:6px;'>" + sess.title + "</div>"
+      + "<div style='display:flex;align-items:center;gap:8px;'>"
+      + "<div style='font-size:28px;'>" + sRank.emoji + "</div>"
+      + "<div><div style='font-size:14px;font-weight:900;color:#1e1e1e;'>" + sRank.label + "</div>"
+      + "<div style='font-size:11px;color:#6b7280;'>取り組み " + (sStats.count||0) + "回</div></div></div>";
+    perGrid.appendChild(sc);
+  });
+  div.appendChild(perGrid);
+
+  app.appendChild(div);
+}
+
 function pageShuffleSetup() {
   var div = el("div","slide-up");
 
   // タイトル
   var h2 = el("div");
-  h2.style.cssText = "font-size:18px;font-weight:900;color:#1e1b4b;margin-bottom:6px;";
+  h2.style.cssText = "font-size:18px;font-weight:900;color:#1e1b4b;margin-bottom:4px;";
   h2.textContent = "🔀 シャッフルドリル";
   var sub = el("div");
-  sub.style.cssText = "font-size:13px;color:#9ca3af;margin-bottom:20px;";
+  sub.style.cssText = "font-size:13px;color:#9ca3af;margin-bottom:16px;";
   sub.textContent = "回・レベル・問題数をえらんでね";
   div.appendChild(h2);
   div.appendChild(sub);
 
-  // 回を選ぶ
+  // ===== 全体段位カード =====
+  var allStats = getShuffleStats("all");
+  var allRank  = getShuffleRank(allStats.count||0);
+  var allNext  = getNextRank(allStats.count||0);
+  var allCard  = el("div");
+  allCard.style.cssText = "background:linear-gradient(135deg,#1e1b4b,#312e81);border-radius:16px;padding:14px 18px;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;";
+  allCard.innerHTML = "<div style='display:flex;align-items:center;gap:10px;'>"
+    + "<div style='font-size:30px;'>" + allRank.emoji + "</div>"
+    + "<div><div style='font-size:11px;color:#a5b4fc;font-weight:700;letter-spacing:1px;'>🌐 ぜんたい段位</div>"
+    + "<div style='font-size:17px;font-weight:900;color:white;'>" + allRank.label + "</div>"
+    + "<div style='font-size:11px;color:#a5b4fc;'>取り組み " + (allStats.count||0) + "かい</div></div></div>"
+    + "<div style='text-align:right;font-size:11px;color:#a5b4fc;'>"
+    + (allNext ? "格上げまであと<br><b style='color:#fde68a;font-size:16px;'>" + (allNext.min - (allStats.count||0)) + "</b>かい" : "<b style='color:#fde68a;'>最高位！</b>")
+    + "</div>";
+  div.appendChild(allCard);
+
+  // ===== 回を選ぶ =====
   var secLabel1 = el("div");
-  secLabel1.style.cssText = "font-size:13px;font-weight:800;color:#92400e;margin-bottom:8px;letter-spacing:1px;";
+  secLabel1.style.cssText = "font-size:13px;font-weight:800;color:#92400e;margin-bottom:8px;letter-spacing:1px;margin-top:16px;";
   secLabel1.textContent = "📚 回をえらぶ（複数OK）";
   div.appendChild(secLabel1);
 
@@ -3394,32 +3573,49 @@ function pageShuffleSetup() {
   S.sessions.forEach(function(sess) { selectedSessions[sess.id] = true; });
 
   var sessionGrid = el("div");
-  sessionGrid.style.cssText = "display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:20px;";
+  sessionGrid.style.cssText = "display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:16px;";
+
   S.sessions.forEach(function(sess) {
-    var btn = el("button");
-    btn.style.cssText = "padding:10px 8px;border-radius:12px;border:2.5px solid #4338ca;background:linear-gradient(135deg,#ede9fe,#ddd6fe);font-size:13px;font-weight:800;color:#1e1b4b;cursor:pointer;font-family:inherit;";
-    btn.textContent = sess.title;
-    btn.dataset.selected = "1";
-    btn.onclick = function() {
-      if (btn.dataset.selected === "1") {
-        btn.dataset.selected = "0";
-        btn.style.background = "white";
-        btn.style.borderColor = "#d1d5db";
-        btn.style.color = "#9ca3af";
+    var sStats = getShuffleStats(sess.title);
+    var sRank  = getShuffleRank(sStats.count||0);
+    var sNext  = getNextRank(sStats.count||0);
+    var wrap   = el("div");
+    wrap.style.cssText = "border-radius:14px;border:2.5px solid #4338ca;background:linear-gradient(135deg,#ede9fe,#ddd6fe);cursor:pointer;overflow:hidden;";
+
+    var top = el("div");
+    top.style.cssText = "padding:8px 10px 4px;display:flex;align-items:center;justify-content:space-between;";
+    top.innerHTML = "<span style='font-size:13px;font-weight:900;color:#1e1b4b;'>" + sess.title + "</span>";
+
+    var bot = el("div");
+    bot.style.cssText = "padding:0 10px 8px;font-size:11px;color:#6b7280;font-weight:600;";
+    bot.innerHTML = "取り組み " + (sStats.count||0) + "回（シャッフル）";
+
+    wrap.appendChild(top);
+    wrap.appendChild(bot);
+    wrap.dataset.selected = "1";
+
+    wrap.onclick = function() {
+      if (wrap.dataset.selected === "1") {
+        wrap.dataset.selected = "0";
+        wrap.style.background = "white";
+        wrap.style.borderColor = "#d1d5db";
+        top.querySelector("span").style.color = "#9ca3af";
+        bot.style.color = "#d1d5db";
         selectedSessions[sess.id] = false;
       } else {
-        btn.dataset.selected = "1";
-        btn.style.background = "linear-gradient(135deg,#ede9fe,#ddd6fe)";
-        btn.style.borderColor = "#4338ca";
-        btn.style.color = "#1e1b4b";
+        wrap.dataset.selected = "1";
+        wrap.style.background = "linear-gradient(135deg,#ede9fe,#ddd6fe)";
+        wrap.style.borderColor = "#4338ca";
+        top.querySelector("span").style.color = "#1e1b4b";
+        bot.style.color = "#6366f1";
         selectedSessions[sess.id] = true;
       }
     };
-    sessionGrid.appendChild(btn);
+    sessionGrid.appendChild(wrap);
   });
   div.appendChild(sessionGrid);
 
-  // レベルを選ぶ
+  // ===== レベルを選ぶ =====
   var secLabel2 = el("div");
   secLabel2.style.cssText = "font-size:13px;font-weight:800;color:#92400e;margin-bottom:8px;letter-spacing:1px;";
   secLabel2.textContent = "⭐ レベルをえらぶ（複数OK）";
@@ -3427,7 +3623,7 @@ function pageShuffleSetup() {
 
   var selectedLevels = {1:true, 2:true, 3:true, 4:true};
   var levelGrid = el("div");
-  levelGrid.style.cssText = "display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:20px;";
+  levelGrid.style.cssText = "display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:16px;";
   LC.forEach(function(lc) {
     var btn = el("button");
     btn.style.cssText = "padding:10px 8px;border-radius:12px;border:2.5px solid " + lc.color + ";background:" + lc.color + "20;font-size:12px;font-weight:800;color:" + lc.color + ";cursor:pointer;font-family:inherit;";
@@ -3452,13 +3648,13 @@ function pageShuffleSetup() {
   });
   div.appendChild(levelGrid);
 
-  // 問題数を選ぶ
+  // ===== 問題数を選ぶ =====
   var secLabel3 = el("div");
   secLabel3.style.cssText = "font-size:13px;font-weight:800;color:#92400e;margin-bottom:8px;letter-spacing:1px;";
   secLabel3.textContent = "🔢 問題数をえらぶ";
   div.appendChild(secLabel3);
 
-  var numOptions = [10, 20, 30, 0]; // 0=全問
+  var numOptions = [10, 20, 30, 0];
   var numLabels  = ["10問", "20問", "30問", "全問"];
   var selectedNum = 10;
   var numGrid = el("div");
@@ -3474,8 +3670,8 @@ function pageShuffleSetup() {
       numBtns.forEach(function(b, j) {
         var a = numOptions[j] === n;
         b.style.borderColor = a ? "#c1121f" : "#d1d5db";
-        b.style.background  = a ? "#fee2e2"  : "white";
-        b.style.color       = a ? "#c1121f"  : "#9ca3af";
+        b.style.background  = a ? "#fee2e2" : "white";
+        b.style.color       = a ? "#c1121f" : "#9ca3af";
       });
     };
     numBtns.push(btn);
@@ -3483,42 +3679,45 @@ function pageShuffleSetup() {
   });
   div.appendChild(numGrid);
 
-  // スタートボタン
+  // ===== スタートボタン =====
   var startBtn = el("button","btn-red");
   startBtn.textContent = "🔀 シャッフルスタート！";
   startBtn.style.marginBottom = "12px";
   startBtn.onclick = function() {
-    // 選ばれた問題を集める
     var pool = [];
+    var usedSessions = [];
     S.sessions.forEach(function(sess) {
       if (!selectedSessions[sess.id]) return;
       if (!sess.levels) return;
+      usedSessions.push(sess.title);
       sess.levels.forEach(function(lv) {
         if (!selectedLevels[lv.level]) return;
         lv.questions.forEach(function(q) {
-          pool.push({sentence: q.sentence, answer: q.answer, from: sess.title + " L" + lv.level});
+          pool.push({ sentence: q.sentence, answer: q.answer, from: sess.title + " L" + lv.level });
         });
       });
     });
-    if (pool.length === 0) {
-      alert("問題がありません。回とレベルを選んでください。");
-      return;
-    }
-    // シャッフル
+    if (pool.length === 0) { alert("問題がありません。回とレベルを選んでください。"); return; }
     for (var i = pool.length - 1; i > 0; i--) {
       var j = Math.floor(Math.random() * (i + 1));
       var tmp = pool[i]; pool[i] = pool[j]; pool[j] = tmp;
     }
-    // 問題数で切る
-    var finalQs = selectedNum === 0 ? pool : pool.slice(0, Math.min(selectedNum, pool.length));
+    // 同じanswerの問題を除外（送り仮名除いた漢字部分で判定）
+    var seenA = {};
+    var dedupedPool = [];
+    for (var di = 0; di < pool.length; di++) {
+      var baseA = pool[di].answer.replace(/[ぁ-ん]/g, "");
+      if (!seenA[baseA]) { seenA[baseA] = true; dedupedPool.push(pool[di]); }
+    }
+    var finalQs = selectedNum === 0 ? dedupedPool : dedupedPool.slice(0, Math.min(selectedNum, dedupedPool.length));
     S.level = "shuffle";
+    S.shuffleSessionTitles = usedSessions;
     S.ps = makePracticeState(finalQs);
     S.screen = "practice";
     render();
   };
   div.appendChild(startBtn);
 
-  // 戻るボタン
   var backBtn = el("button","btn-ghost");
   backBtn.textContent = "← ホームにもどる";
   backBtn.onclick = function() { S.screen = "home"; render(); };
@@ -3578,7 +3777,12 @@ function pageDrill() {
     <div style="font-size:13px;font-weight:800;color:white;background:rgba(255,255,255,0.15);border-radius:10px;padding:6px 12px;">チャレンジ →</div>`;
   sumBtn.onclick = function() {
     var shuffled = allQs.slice().sort(function() { return Math.random()-0.5; });
-    var picked = shuffled.slice(0, 10);
+    var seen = {};
+    var picked = [];
+    for (var i = 0; i < shuffled.length && picked.length < 10; i++) {
+      var baseAnswer = shuffled[i].answer.replace(/[ぁ-ん]/g, "");
+      if (!seen[baseAnswer]) { seen[baseAnswer] = true; picked.push(shuffled[i]); }
+    }
     S.level = "summary"; S.ps = makePracticeState(picked); S.screen = "practice"; render();
   };
   div.appendChild(sumBtn);
@@ -3645,9 +3849,85 @@ function pagePractice() {
     if (isClearedNow) { setTimeout(function(){ showAnimalGrowth(S.active ? S.active.title : ""); }, 400); }
     if (allLevelsCleared) { setTimeout(launchFireworks, 300); }
 
+    // シャッフル・まとめ段位
+    if (S.level === "shuffle" || S.level === "summary") {
+      var sessionTitles = S.level === "shuffle" ? (S.shuffleSessionTitles || []) : [];
+      var rankUps = [];
+
+      // 全体段位を更新
+      var allOld = getShuffleStats("all");
+      var allOldRank = getShuffleRank(allOld.count || 0);
+      allOld.count = (allOld.count || 0) + 1;
+      allOld.total += total; allOld.correct += correct;
+      saveShuffleStats("all", allOld);
+      var allNewRank = getShuffleRank(allOld.count);
+      var allNext = getNextRank(allOld.count);
+      if (allNewRank.label !== allOldRank.label) rankUps.push({ old: allOldRank, next: allNewRank, label: "ぜんたい" });
+
+      // 各回の段位を更新
+      var sessionRankCards = [];
+      sessionTitles.forEach(function(title) {
+        var sOld = getShuffleStats(title);
+        var sOldRank = getShuffleRank(sOld.count || 0);
+        sOld.count = (sOld.count || 0) + 1;
+        sOld.total += total; sOld.correct += correct;
+        saveShuffleStats(title, sOld);
+        var sNewRank = getShuffleRank(sOld.count);
+        var sNext = getNextRank(sOld.count);
+        if (sNewRank.label !== sOldRank.label) rankUps.push({ old: sOldRank, next: sNewRank, label: title });
+        sessionRankCards.push({ title: title, rank: sNewRank, count: sOld.count, next: sNext });
+      });
+
+      // 全体段位カード
+      var allCard = el("div");
+      allCard.style.cssText = "margin-top:16px;background:linear-gradient(135deg,#1e1b4b,#312e81);border-radius:20px;padding:18px 20px;";
+      allCard.innerHTML = "<div style='display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;'>"
+        + "<div style='font-size:11px;color:#a5b4fc;font-weight:700;letter-spacing:1px;'>🌐 ぜんたい段位</div></div>"
+        + "<div style='display:flex;align-items:center;gap:14px;'>"
+        + "<div style='font-size:48px;" + (rankUps.some(function(r){return r.label==="ぜんたい";}) ? "animation:animalPop 0.6s cubic-bezier(0.34,1.56,0.64,1) forwards;" : "") + "'>" + allNewRank.emoji + "</div>"
+        + "<div><div style='font-size:22px;font-weight:900;color:white;'>" + allNewRank.label + "</div>"
+        + "<div style='font-size:12px;color:#a5b4fc;'>取り組み " + allOld.count + "かい</div>"
+        + (allNext ? "<div style='margin-top:6px;background:rgba(255,255,255,0.1);border-radius:8px;padding:5px 10px;font-size:12px;color:#c7d2fe;'>格上げまであと <b style='color:#fde68a;font-size:14px;'>" + (allNext.min - allOld.count) + "</b>かい</div>"
+                   : "<div style='font-size:12px;color:#fde68a;font-weight:800;'>🏆 最高位！</div>")
+        + "</div></div>";
+      div.appendChild(allCard);
+
+      // 各回カード（複数回選んだ場合）
+      if (sessionRankCards.length >= 1) {
+        var perGrid = el("div");
+        perGrid.style.cssText = "display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:8px;";
+        sessionRankCards.forEach(function(sr) {
+          var sc = el("div");
+          sc.style.cssText = "background:rgba(255,255,255,0.07);border:1.5px solid #3730a3;border-radius:14px;padding:10px 12px;";
+          sc.innerHTML = "<div style='font-size:11px;color:#a5b4fc;font-weight:700;margin-bottom:4px;'>" + sr.title + "</div>"
+            + "<div style='display:flex;align-items:center;gap:8px;'>"
+            + "<div style='font-size:24px;'>" + sr.rank.emoji + "</div>"
+            + "<div><div style='font-size:13px;font-weight:900;color:white;'>" + sr.rank.label + "</div>"
+            + "<div style='font-size:10px;color:#a5b4fc;'>取り組み " + sr.count + "かい</div>"
+            + (sr.next ? "<div style='font-size:10px;color:#fde68a;'>格上げまであと" + (sr.next.min - sr.count) + "かい</div>" : "<div style='font-size:10px;color:#fde68a;'>🏆最高位</div>")
+            + "</div></div>";
+          perGrid.appendChild(sc);
+        });
+        div.appendChild(perGrid);
+      }
+
+      // 段位アップポップアップ
+      rankUps.forEach(function(ru, i) {
+        setTimeout(function() { showRankUp(ru.old, ru.next, ru.label); }, 500 + i * 800);
+      });
+    }
+
     var resetBtn = el("button","btn-ghost"); resetBtn.style.marginTop="10px"; resetBtn.textContent = "🔄 もう一度やる";
     resetBtn.onclick = function() { S.ps = makePracticeState(ps.questions); render(); };
     div.appendChild(resetBtn);
+
+    if (S.level === "summary" || S.level === "shuffle") {
+      var homeBtn = el("button","btn-ghost");
+      homeBtn.style.cssText = "margin-top:8px;border-color:#d1d5db;color:#6b7280;";
+      homeBtn.textContent = "🏠 ホームにもどる";
+      homeBtn.onclick = function() { S.screen="home"; S.active=null; S.ps=null; S.level=null; render(); };
+      div.appendChild(homeBtn);
+    }
   }
 
   app.innerHTML = ""; app.appendChild(div);
@@ -3782,6 +4062,16 @@ function buildQCard(q, qi, ps) {
       });
       var lbl=el("div"); lbl.style.cssText="font-size:10px;color:#92400e;font-weight:700;"; lbl.textContent="こたえ";
       aw.appendChild(ar); aw.appendChild(lbl); ctrl.appendChild(aw);
+      if (!ps.verdicts[qi]) {
+        var rewBtn=el("button"); rewBtn.textContent="✏️ もう一度書く";
+        rewBtn.style.cssText="padding:8px 10px;border-radius:10px;border:1.5px solid #4338ca;background:#ede9fe;color:#3730a3;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;text-align:center;width:100%;";
+        rewBtn.onclick=function() {
+          shown=false;
+          drawn={};
+          rebuild();
+        };
+        ctrl.appendChild(rewBtn);
+      }
       if (!ps.verdicts[qi]) {
         var btns=el("div","pop-in"); btns.style.cssText="display:flex;gap:6px;justify-content:center;";
         var ok=el("button"); ok.textContent="⭕";
@@ -3939,6 +4229,46 @@ function showAnimalGrowth(sessionTitle) {
   overlay.onclick = function(e) { if (e.target === overlay) overlay.remove(); };
   document.body.appendChild(overlay);
 }
+function showRankUp(oldRank, newRank, label) {
+  var overlay = document.createElement("div");
+  overlay.style.cssText = "position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:10000;display:flex;align-items:center;justify-content:center;";
+
+  var box = document.createElement("div");
+  box.style.cssText = "background:linear-gradient(135deg,#1e1b4b,#312e81);border-radius:28px;padding:32px 28px;text-align:center;max-width:300px;width:90%;border:3px solid #818cf8;box-shadow:0 20px 60px rgba(0,0,0,0.5);";
+
+  var titleDiv = document.createElement("div");
+  titleDiv.style.cssText = "font-size:14px;font-weight:900;color:#a5b4fc;letter-spacing:2px;margin-bottom:16px;";
+  titleDiv.textContent = "🔀 " + (label || "シャッフル") + " 段位アップ！";
+
+  var animDiv = document.createElement("div");
+  animDiv.style.cssText = "display:flex;align-items:center;justify-content:center;gap:16px;margin-bottom:20px;";
+  animDiv.innerHTML = "<div style='font-size:48px;opacity:0.4;'>" + oldRank.emoji + "</div>"
+    + "<div style='font-size:28px;color:#818cf8;'>→</div>"
+    + "<div style='font-size:64px;animation:animalPop 0.6s cubic-bezier(0.34,1.56,0.64,1) forwards;filter:drop-shadow(0 0 16px #818cf8);'>" + newRank.emoji + "</div>";
+
+  var nameDiv = document.createElement("div");
+  nameDiv.style.cssText = "font-size:28px;font-weight:900;color:white;margin-bottom:6px;";
+  nameDiv.textContent = newRank.label;
+
+  var subDiv = document.createElement("div");
+  subDiv.style.cssText = "font-size:13px;color:#a5b4fc;margin-bottom:20px;";
+  subDiv.textContent = "シャッフルで段位があがったよ！";
+
+  var btn = document.createElement("button");
+  btn.style.cssText = "background:linear-gradient(135deg,#6366f1,#4338ca);color:white;border:none;border-radius:14px;padding:12px 32px;font-size:15px;font-weight:900;cursor:pointer;font-family:inherit;";
+  btn.textContent = "やったー！";
+  btn.onclick = function() { overlay.remove(); };
+
+  box.appendChild(titleDiv);
+  box.appendChild(animDiv);
+  box.appendChild(nameDiv);
+  box.appendChild(subDiv);
+  box.appendChild(btn);
+  overlay.appendChild(box);
+  overlay.onclick = function(e) { if (e.target === overlay) overlay.remove(); };
+  document.body.appendChild(overlay);
+}
+
 function launchFireworks() {
   var canvas = document.createElement("canvas");
   canvas.style.cssText = "position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:9999;";
