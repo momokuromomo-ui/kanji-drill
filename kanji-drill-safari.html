@@ -3223,11 +3223,11 @@ function pageHome() {
   rankBar.style.cssText = "margin-top:12px;background:linear-gradient(135deg,#1e1b4b,#312e81);border-radius:16px;padding:14px 18px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;";
   rankBar.innerHTML = "<div style='display:flex;align-items:center;gap:10px;'>"
     + "<div style='font-size:30px;'>" + homeRank.emoji + "</div>"
-    + "<div><div style='font-size:11px;color:#a5b4fc;font-weight:700;letter-spacing:1px;'>🔀 漢字道場</div>"
+    + "<div><div style='font-size:11px;color:#a5b4fc;font-weight:700;letter-spacing:1px;'>⚔️ 漢字道場</div>"
     + "<div style='font-size:17px;font-weight:900;color:white;'>" + homeRank.label + "</div>"
     + "<div style='font-size:11px;color:#a5b4fc;'>取り組み " + (homeStats.count||0) + "かい</div></div></div>"
     + "<div style='text-align:right;font-size:11px;color:#a5b4fc;'>"
-    + (homeNext ? "格上げまであと<br><b style='color:#fde68a;font-size:16px;'>" + (homeNext.min - (homeStats.count||0)) + "</b>かい" : "<b style='color:#fde68a;'>最高位！</b>")
+    + (homeNext ? "格上げまであと<br><b style='color:#fde68a;font-size:16px;'>" + (homeNext.min - (homeStats.count||0)) + "</b>回" : "<b style='color:#fde68a;'>最高位！</b>")
     + "</div>";
   rankBar.onclick = function() { S.screen = "rankDetail"; render(); };
   div.appendChild(rankBar);
@@ -3339,9 +3339,22 @@ var SHUFFLE_RANKS = [
 var SK_SHUFFLE = "kanji_shuffle_v1";
 
 function shuffleKey(key) {
-  // 日本語タイトルを安全なキーに変換
-  if (!key || key === "all") return SK_SHUFFLE + "_all";
-  // "第1回"→"s1", "第2回"→"s2" など
+  // key設計:
+  //   "all"       → _all   : まとめ+シャッフル合計（段位用）
+  //   "shuf"      → _shuf  : シャッフル全体回数
+  //   "sum_第1回"  → _m1   : 各回まとめ回数
+  //   "su_第1回"   → _su1  : 各回シャッフル利用回数
+  if (!key || key === "all")  return SK_SHUFFLE + "_all";
+  if (key === "shuf")          return SK_SHUFFLE + "_shuf";
+  if (key.indexOf("sum_") === 0) {
+    var sm = key.match(/(\d+)/);
+    return SK_SHUFFLE + "_m" + (sm ? sm[1] : "0");
+  }
+  if (key.indexOf("su_") === 0) {
+    var su = key.match(/(\d+)/);
+    return SK_SHUFFLE + "_su" + (su ? su[1] : "0");
+  }
+  // 旧キー互換（_s1など）は参照しない
   var m = key.match(/(\d+)/);
   return SK_SHUFFLE + "_s" + (m ? m[1] : key.replace(/[^a-zA-Z0-9]/g, ""));
 }
@@ -3465,15 +3478,15 @@ function pageRankDetail() {
   var allNext  = getNextRank(allStats.count || 0);
   var allCard  = el("div");
   allCard.style.cssText = "background:linear-gradient(135deg,#1e1b4b,#312e81);border-radius:20px;padding:20px;margin-bottom:16px;";
-  allCard.innerHTML = "<div style='font-size:11px;color:#a5b4fc;font-weight:700;letter-spacing:1px;margin-bottom:12px;'>🌐 ぜんたい</div>"
+  allCard.innerHTML = "<div style='font-size:11px;color:#a5b4fc;font-weight:700;letter-spacing:1px;margin-bottom:12px;'>⚔️ 漢字道場　全体段位</div>"
     + "<div style='display:flex;align-items:center;gap:14px;margin-bottom:12px;'>"
     + "<div style='font-size:52px;'>" + allRank.emoji + "</div>"
     + "<div><div style='font-size:24px;font-weight:900;color:white;'>" + allRank.label + "</div>"
-    + "<div style='font-size:13px;color:#a5b4fc;'>シャッフル全体 取り組み " + (allStats.count||0) + "かい</div></div></div>"
+    + "<div style='font-size:13px;color:#a5b4fc;'>合計取り組み " + (allStats.count||0) + "回（まとめ＋シャッフル）</div></div></div>"
     + (allNext
       ? "<div style='background:rgba(255,255,255,0.1);border-radius:10px;padding:10px 14px;display:flex;align-items:center;justify-content:space-between;'>"
         + "<div style='font-size:12px;color:#c7d2fe;'>次の段位「" + allNext.label + "」</div>"
-        + "<div style='font-size:13px;font-weight:900;color:#fde68a;'>格上げまであと " + (allNext.min - (allStats.count||0)) + "かい</div></div>"
+        + "<div style='font-size:13px;font-weight:900;color:#fde68a;'>あと " + (allNext.min - (allStats.count||0)) + "回</div></div>"
       : "<div style='font-size:14px;color:#fde68a;font-weight:900;text-align:center;'>👑 最高位！すごい！</div>");
   div.appendChild(allCard);
 
@@ -3508,25 +3521,21 @@ function pageRankDetail() {
   var perGrid = el("div");
   perGrid.style.cssText = "display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:16px;";
     // シャッフル全体枠（先頭に表示）
+  var shufStats = getShuffleStats("shuf");
   var allSc = el("div");
-  allSc.style.cssText = "background:linear-gradient(135deg,#1e1b4b,#312e81);border-radius:14px;padding:12px;grid-column:1/-1;";
-  allSc.innerHTML = "<div style='font-size:12px;font-weight:800;color:#a5b4fc;margin-bottom:6px;'>🌐 シャッフル全体</div>"
-    + "<div style='display:flex;align-items:center;gap:8px;'>"
-    + "<div style='font-size:28px;'>" + allRank.emoji + "</div>"
-    + "<div><div style='font-size:14px;font-weight:900;color:white;'>" + allRank.label + "</div>"
-    + "<div style='font-size:11px;color:#a5b4fc;'>取り組み " + (allStats.count||0) + "回</div></div></div>";
+  allSc.style.cssText = "background:linear-gradient(135deg,#1e1b4b,#312e81);border-radius:14px;padding:12px 16px;grid-column:1/-1;display:flex;align-items:center;justify-content:space-between;";
+  allSc.innerHTML = "<div style='font-size:12px;font-weight:800;color:#a5b4fc;'>🔀 シャッフル全体</div>"
+    + "<div style='font-size:16px;font-weight:900;color:white;'>" + (shufStats.count||0) + "<span style='font-size:11px;color:#a5b4fc;font-weight:400;'> 回</span></div>";
   perGrid.appendChild(allSc);
 
   S.sessions.forEach(function(sess) {
-    var sStats = getShuffleStats(sess.title);
-    var sRank  = getShuffleRank(sStats.count || 0);
+    var sumStats = getShuffleStats("sum_" + sess.title);
+    var suStats  = getShuffleStats("su_" + sess.title);
     var sc = el("div");
     sc.style.cssText = "background:white;border:1.5px solid #e5e7eb;border-radius:14px;padding:12px;";
     sc.innerHTML = "<div style='font-size:12px;font-weight:800;color:#92400e;margin-bottom:6px;'>" + sess.title + "</div>"
-      + "<div style='display:flex;align-items:center;gap:8px;'>"
-      + "<div style='font-size:28px;'>" + sRank.emoji + "</div>"
-      + "<div><div style='font-size:14px;font-weight:900;color:#1e1e1e;'>" + sRank.label + "</div>"
-      + "<div style='font-size:11px;color:#6b7280;'>取り組み " + (sStats.count||0) + "回</div></div></div>";
+      + "<div style='font-size:12px;color:#374151;font-weight:700;'>まとめ " + (sumStats.count||0) + "回</div>"
+      + "<div style='font-size:11px;color:#9ca3af;'>シャッフル利用 " + (suStats.count||0) + "回</div>";
     perGrid.appendChild(sc);
   });
   div.appendChild(perGrid);
@@ -3851,10 +3860,11 @@ function pagePractice() {
 
     // シャッフル・まとめ段位
     if (S.level === "shuffle" || S.level === "summary") {
-      var sessionTitles = S.level === "shuffle" ? (S.shuffleSessionTitles || []) : [];
-      var rankUps = [];
+            var rankUps = [];
+      var isShuffle = (S.level === "shuffle");
+      var isSummary = (S.level === "summary");
 
-      // 全体段位を更新
+      // 全体カウント（まとめ+シャッフル両方）→段位用
       var allOld = getShuffleStats("all");
       var allOldRank = getShuffleRank(allOld.count || 0);
       allOld.count = (allOld.count || 0) + 1;
@@ -3864,19 +3874,27 @@ function pagePractice() {
       var allNext = getNextRank(allOld.count);
       if (allNewRank.label !== allOldRank.label) rankUps.push({ old: allOldRank, next: allNewRank, label: "ぜんたい" });
 
-      // 各回の段位を更新
+      if (isShuffle) {
+        // シャッフル全体回数
+        var shufOld = getShuffleStats("shuf");
+        shufOld.count = (shufOld.count || 0) + 1;
+        saveShuffleStats("shuf", shufOld);
+        // 各回シャッフル利用回数
+        var shuffleTitles = S.shuffleSessionTitles || [];
+        shuffleTitles.forEach(function(title) {
+          var suOld = getShuffleStats("su_" + title);
+          suOld.count = (suOld.count || 0) + 1;
+          saveShuffleStats("su_" + title, suOld);
+        });
+      }
+      if (isSummary && S.active) {
+        // 各回まとめ回数
+        var sumOld = getShuffleStats("sum_" + S.active.title);
+        sumOld.count = (sumOld.count || 0) + 1;
+        sumOld.total += total; sumOld.correct += correct;
+        saveShuffleStats("sum_" + S.active.title, sumOld);
+      }
       var sessionRankCards = [];
-      sessionTitles.forEach(function(title) {
-        var sOld = getShuffleStats(title);
-        var sOldRank = getShuffleRank(sOld.count || 0);
-        sOld.count = (sOld.count || 0) + 1;
-        sOld.total += total; sOld.correct += correct;
-        saveShuffleStats(title, sOld);
-        var sNewRank = getShuffleRank(sOld.count);
-        var sNext = getNextRank(sOld.count);
-        if (sNewRank.label !== sOldRank.label) rankUps.push({ old: sOldRank, next: sNewRank, label: title });
-        sessionRankCards.push({ title: title, rank: sNewRank, count: sOld.count, next: sNext });
-      });
 
       // 全体段位カード
       var allCard = el("div");
@@ -3945,8 +3963,9 @@ function updateResWrap(ps) {
       ps.done = true;
       var correct = Object.values(ps.verdicts).filter(function(v) { return v==="correct"; }).length;
       var wrongs = ps.questions.filter(function(_,qi) { return ps.verdicts[qi]==="wrong"; }).map(function(q) { return { sentence: q.sentence, answer: q.answer }; });
-      var lc = S.level !== "summary" ? LC[S.level-1] : null;
-      addHistory({ date: new Date().toISOString(), sessionTitle: (S.active ? S.active.title : ""), levelTitle: lc ? lc.title : "まとめテスト", total: ps.questions.length, correct, wrongs });
+      var lc = (S.level !== "summary" && S.level !== "shuffle") ? LC[S.level-1] : null;
+      var lvTitle = S.level === "shuffle" ? "シャッフル" : (S.level === "summary" ? "まとめ" : (lc ? lc.title : "まとめ"));
+      addHistory({ date: new Date().toISOString(), sessionTitle: (S.active ? S.active.title : ""), levelTitle: lvTitle, total: ps.questions.length, correct: correct, wrongs: wrongs, shuffleSessions: S.level === "shuffle" ? (S.shuffleSessionTitles || []) : [] });
       pagePractice();
     };
     wrap.appendChild(btn);
@@ -3985,24 +4004,98 @@ function pageHistory() {
   var listLabel = el("div"); listLabel.style.cssText = "font-size:13px;color:#9ca3af;font-weight:600;margin-bottom:12px;letter-spacing:1px;"; listLabel.textContent = `取り組み記録（${history.length}件）`;
   div.appendChild(listLabel);
 
-  history.forEach(function(r) {
+  history.forEach(function(r, ridx) {
     var d = new Date(r.date);
-    var dateStr = `${d.getFullYear()}/${d.getMonth()+1}/${d.getDate()}`;
-    var timeStr = `${String(d.getHours()).padStart(2,"0")}:${String(d.getMinutes()).padStart(2,"0")}`;
+    var dateStr = (d.getFullYear()) + "/" + (d.getMonth()+1) + "/" + (d.getDate());
+    var timeStr = String(d.getHours()).padStart(2,"0") + ":" + String(d.getMinutes()).padStart(2,"0");
     var pct = Math.round(r.correct/r.total*100);
     var color = pct===100?"#16a34a":pct>=70?"#3b82f6":pct>=40?"#f59e0b":"#dc2626";
     var row = el("div");
-    row.style.cssText = `background:white;border:2px solid #f0e6d3;border-radius:16px;padding:14px 18px;margin-bottom:10px;box-shadow:0 1px 8px rgba(0,0,0,0.05);`;
-    row.innerHTML = `
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
-        <div><span style="font-size:14px;font-weight:800;color:#1e1b4b;">${r.sessionTitle}</span><span style="font-size:12px;color:#9ca3af;margin-left:8px;">${r.levelTitle}</span></div>
-        <div style="font-size:22px;font-weight:900;color:${color};">${r.correct}<span style="font-size:13px;color:#9ca3af;font-weight:400;">/${r.total}</span></div>
-      </div>
-      <div style="display:flex;align-items:center;gap:10px;">
-        <div style="flex:1;height:6px;background:#f0e6d3;border-radius:3px;overflow:hidden;"><div style="width:${pct}%;height:100%;background:${color};border-radius:3px;transition:width 0.5s;"></div></div>
-        <div style="font-size:11px;color:#9ca3af;white-space:nowrap;">${dateStr} ${timeStr}</div>
-      </div>
-      ${r.wrongs && r.wrongs.length>0 ? "<div style='margin-top:8px;padding-top:8px;border-top:1px solid #f0e6d3;'><span style='font-size:11px;color:#dc2626;font-weight:700;'>ミス：</span>" + r.wrongs.map(function(w) { return "<span style='font-size:13px;font-weight:800;color:#1e1e1e;margin-right:6px;'>" + w.answer + "</span>"; }).join("") + "</div>" : ""}`;
+    row.style.cssText = "background:white;border:2px solid #f0e6d3;border-radius:16px;padding:14px 18px;margin-bottom:10px;box-shadow:0 1px 8px rgba(0,0,0,0.05);";
+
+    // 上段：回タイトル・レベル・削除ボタン・スコア
+    var topRow = el("div");
+    topRow.style.cssText = "display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;";
+
+    var titleWrap = el("div");
+    titleWrap.style.cssText = "display:flex;align-items:center;gap:8px;flex:1;min-width:0;";
+    var delBtn = el("button");
+    delBtn.textContent = "🗑";
+    delBtn.style.cssText = "border:none;background:none;font-size:16px;cursor:pointer;padding:2px 4px;flex-shrink:0;opacity:0.5;";
+    delBtn.onmouseenter = function() { delBtn.style.opacity = "1"; };
+    delBtn.onmouseleave = function() { delBtn.style.opacity = "0.5"; };
+    (function(idx, dStr, tStr) {
+      delBtn.onclick = function() {
+        // window.confirmはfile://で動かないので独自UI
+        var overlay = document.createElement("div");
+        overlay.style.cssText = "position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:9999;display:flex;align-items:center;justify-content:center;";
+        var box = document.createElement("div");
+        box.style.cssText = "background:white;border-radius:16px;padding:24px 20px;max-width:280px;width:90%;text-align:center;";
+        box.innerHTML = "<div style='font-size:14px;font-weight:700;color:#dc2626;margin-bottom:6px;'>この記録を削除しますか？</div>"
+          + "<div style='font-size:12px;color:#9ca3af;margin-bottom:16px;'>" + dStr + " " + tStr + "</div>";
+        var yBtn = document.createElement("button");
+        yBtn.textContent = "削除する";
+        yBtn.style.cssText = "background:#dc2626;color:white;border:none;border-radius:10px;padding:10px 20px;font-weight:800;font-size:14px;cursor:pointer;margin-right:8px;font-family:inherit;";
+        yBtn.onclick = function() {
+          overlay.remove();
+          var h = loadHistory();
+          h.splice(idx, 1);
+          saveHistory(h);
+          rebuildShuffleStatsFromHistory(h);
+          render();
+        };
+        var nBtn = document.createElement("button");
+        nBtn.textContent = "キャンセル";
+        nBtn.style.cssText = "background:white;color:#6b7280;border:2px solid #e5e7eb;border-radius:10px;padding:10px 20px;font-weight:700;font-size:14px;cursor:pointer;font-family:inherit;";
+        nBtn.onclick = function() { overlay.remove(); };
+        box.appendChild(yBtn);
+        box.appendChild(nBtn);
+        overlay.appendChild(box);
+        document.body.appendChild(overlay);
+      };
+    })(ridx, dateStr, timeStr);
+    var titleSpan = el("span");
+    titleSpan.style.cssText = "font-size:14px;font-weight:800;color:#1e1b4b;";
+    titleSpan.textContent = r.sessionTitle;
+    var levelSpan = el("span");
+    levelSpan.style.cssText = "font-size:12px;color:#9ca3af;";
+    levelSpan.textContent = r.levelTitle;
+    titleWrap.appendChild(delBtn);
+    titleWrap.appendChild(titleSpan);
+    titleWrap.appendChild(levelSpan);
+
+    var scoreDiv = el("div");
+    scoreDiv.style.cssText = "font-size:22px;font-weight:900;color:" + color + ";flex-shrink:0;";
+    scoreDiv.innerHTML = r.correct + "<span style='font-size:13px;color:#9ca3af;font-weight:400;'>/" + r.total + "</span>";
+
+    topRow.appendChild(titleWrap);
+    topRow.appendChild(scoreDiv);
+    row.appendChild(topRow);
+
+    // プログレスバー
+    var barRow = el("div");
+    barRow.style.cssText = "display:flex;align-items:center;gap:10px;";
+    var barWrap = el("div");
+    barWrap.style.cssText = "flex:1;height:6px;background:#f0e6d3;border-radius:3px;overflow:hidden;";
+    var barFill = el("div");
+    barFill.style.cssText = "width:" + pct + "%;height:100%;background:" + color + ";border-radius:3px;";
+    barWrap.appendChild(barFill);
+    var dateDiv = el("div");
+    dateDiv.style.cssText = "font-size:11px;color:#9ca3af;white-space:nowrap;";
+    dateDiv.textContent = dateStr + " " + timeStr;
+    barRow.appendChild(barWrap);
+    barRow.appendChild(dateDiv);
+    row.appendChild(barRow);
+
+    // ミス表示
+    if (r.wrongs && r.wrongs.length > 0) {
+      var missDiv = el("div");
+      missDiv.style.cssText = "margin-top:8px;padding-top:8px;border-top:1px solid #f0e6d3;";
+      missDiv.innerHTML = "<span style='font-size:11px;color:#dc2626;font-weight:700;'>ミス：</span>"
+        + r.wrongs.map(function(w) { return "<span style='font-size:13px;font-weight:800;color:#1e1e1e;margin-right:6px;'>" + w.answer + "</span>"; }).join("");
+      row.appendChild(missDiv);
+    }
+
     div.appendChild(row);
   });
 
@@ -4015,13 +4108,68 @@ function pageHistory() {
     confirm_div.innerHTML = `<div style="font-size:14px;font-weight:700;color:#dc2626;margin-bottom:12px;">本当に全件削除しますか？</div>`;
     var yesBtn = el("button"); yesBtn.textContent = "はい、削除する";
     yesBtn.style.cssText = `background:#dc2626;color:white;border:none;border-radius:10px;padding:10px 20px;font-weight:800;font-size:14px;cursor:pointer;margin-right:8px;font-family:inherit;`;
-    yesBtn.onclick = function() { saveHistory([]); render(); };
+    yesBtn.onclick = function() { saveHistory([]); rebuildShuffleStatsFromHistory([]); render(); };
     var noBtn = el("button"); noBtn.textContent = "キャンセル";
     noBtn.style.cssText = `background:white;color:#6b7280;border:2px solid #e5e7eb;border-radius:10px;padding:10px 20px;font-weight:700;font-size:14px;cursor:pointer;font-family:inherit;`;
     noBtn.onclick = function() { clearWrap.innerHTML=""; clearWrap.appendChild(clearBtn); };
     confirm_div.appendChild(yesBtn); confirm_div.appendChild(noBtn); clearWrap.appendChild(confirm_div);
   };
   clearWrap.appendChild(clearBtn); div.appendChild(clearWrap); app.appendChild(div);
+}
+
+function rebuildShuffleStatsFromHistory(history) {
+  var allStats  = { count:0, total:0, correct:0 }; // 合計（段位用）
+  var shufStats = { count:0 };                       // シャッフル全体回数
+  var perSum    = {};                                // 各回まとめ回数
+  var perSu     = {};                                // 各回シャッフル利用回数
+
+  history.forEach(function(r) {
+    var isShuffle = r.levelTitle === "シャッフル";
+    var isSummary = r.levelTitle === "まとめ" || r.levelTitle === "まとめテスト" || r.levelTitle === "summary";
+
+    if (isShuffle || isSummary) {
+      allStats.count++;
+      allStats.total   += (r.total   || 0);
+      allStats.correct += (r.correct || 0);
+    }
+    if (isShuffle) {
+      shufStats.count++;
+      if (r.shuffleSessions) {
+        r.shuffleSessions.forEach(function(title) {
+          if (!perSu[title]) perSu[title] = { count:0 };
+          perSu[title].count++;
+        });
+      }
+    }
+    if (isSummary && r.sessionTitle) {
+      if (!perSum[r.sessionTitle]) perSum[r.sessionTitle] = { count:0, total:0, correct:0 };
+      perSum[r.sessionTitle].count++;
+      perSum[r.sessionTitle].total   += (r.total   || 0);
+      perSum[r.sessionTitle].correct += (r.correct || 0);
+    }
+  });
+
+  // 全シャッフル関連キーをlocalStorageから完全削除してから保存
+  try {
+    var keysToDelete = [];
+    for (var ki = 0; ki < localStorage.length; ki++) {
+      var lk = localStorage.key(ki);
+      if (lk && lk.indexOf(SK_SHUFFLE) === 0) keysToDelete.push(lk);
+    }
+    keysToDelete.forEach(function(lk) { localStorage.removeItem(lk); });
+  } catch(e) {}
+  // LS._mem も全クリア
+  var prefix = SK_SHUFFLE;
+  Object.keys(LS._mem).forEach(function(mk) {
+    if (mk.indexOf(prefix) === 0) delete LS._mem[mk];
+  });
+
+  saveShuffleStats("all",  allStats);
+  saveShuffleStats("shuf", shufStats);
+  S.sessions.forEach(function(sess) {
+    saveShuffleStats("sum_" + sess.title, perSum[sess.title]  || { count:0, total:0, correct:0 });
+    saveShuffleStats("su_"  + sess.title, perSu[sess.title]   || { count:0 });
+  });
 }
 
 function buildQCard(q, qi, ps) {
