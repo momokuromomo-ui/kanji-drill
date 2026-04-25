@@ -103,9 +103,13 @@ canvas { touch-action: none; }
 
 <div class="header" id="header">
   <h1>📖 かんじ ドリル</h1>
-  <button id="hist-btn" onclick="S.screen='history';render();" style="
+  <button id="ai-btn" onclick="openAiSettings();" style="
     margin-left:auto;background:rgba(255,255,255,0.2);border:none;border-radius:8px;
-    color:white;padding:6px 13px;cursor:pointer;font-size:14px;font-weight:700;
+    color:white;padding:6px 11px;cursor:pointer;font-size:13px;font-weight:700;
+    font-family:inherit;white-space:nowrap;">🤖 AI</button>
+  <button id="hist-btn" onclick="S.screen='history';render();" style="
+    background:rgba(255,255,255,0.2);border:none;border-radius:8px;
+    color:white;padding:6px 11px;cursor:pointer;font-size:13px;font-weight:700;
     font-family:inherit;white-space:nowrap;">📊 履歴</button>
 </div>
 <div class="container" id="app"></div>
@@ -7191,6 +7195,121 @@ function rebuildShuffleStatsFromHistory(history) {
   });
 }
 
+// ============================================================
+// AI採点（Claude Vision API）
+// ============================================================
+function getApiKey() {
+  var key = LS.getItem("ai_api_key");
+  if (!key) {
+    key = prompt("Claude API キーを入力してください\n（sk-ant-... の形式。「設定」ボタンで後から変更できます）");
+    if (key) {
+      key = key.trim();
+      LS.setItem("ai_api_key", key);
+    }
+  }
+  return key;
+}
+function clearApiKey() { LS.removeItem("ai_api_key"); }
+
+function combineCanvases(dataUrls, size) {
+  return new Promise(function(resolve) {
+    var n = dataUrls.length;
+    if (n === 0) return resolve(null);
+    var canvas = document.createElement("canvas");
+    canvas.width = n * size;
+    canvas.height = size;
+    var ctx = canvas.getContext("2d");
+    ctx.fillStyle = "white";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    var loaded = 0;
+    dataUrls.forEach(function(url, i) {
+      var img = new Image();
+      img.onload = function() {
+        ctx.drawImage(img, i * size, 0, size, size);
+        if (++loaded === n) resolve(canvas.toDataURL("image/png"));
+      };
+      img.onerror = function() {
+        if (++loaded === n) resolve(canvas.toDataURL("image/png"));
+      };
+      img.src = url;
+    });
+  });
+}
+
+async function callClaudeAPI(imageDataUrl, expected) {
+  var apiKey = getApiKey();
+  if (!apiKey) throw new Error("APIキーが設定されていません");
+  var base64 = imageDataUrl.replace(/^data:image\/png;base64,/, "");
+  var promptText =
+    "この画像は小学生が手書きした漢字です。「" + expected + "」と読めるか、" +
+    "小学校の漢字採点者として判定してください。\n" +
+    "判定基準：字形が「" + expected + "」として認識できるか、" +
+    "とめ・はね・はらい、画数、バランス。\n" +
+    "回答は必ず以下のJSON形式のみで返答してください（前後に説明文を付けない）：\n" +
+    "{\"correct\": true または false, \"message\": \"60文字以内の励みになる日本語フィードバック。とめ・はね・はらい等にも触れる\"}";
+  var res = await fetch("https://api.anthropic.com/v1/messages", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "x-api-key": apiKey,
+      "anthropic-version": "2023-06-01",
+      "anthropic-dangerous-direct-browser-access": "true"
+    },
+    body: JSON.stringify({
+      model: "claude-sonnet-4-6",
+      max_tokens: 300,
+      messages: [{
+        role: "user",
+        content: [
+          { type: "image", source: { type: "base64", media_type: "image/png", data: base64 } },
+          { type: "text", text: promptText }
+        ]
+      }]
+    })
+  });
+  if (!res.ok) {
+    var t = await res.text();
+    if (res.status === 401) {
+      clearApiKey();
+      throw new Error("APIキーが無効です。再度入力してください。");
+    }
+    throw new Error("API エラー: " + res.status + " " + t.slice(0, 120));
+  }
+  var data = await res.json();
+  var text = data.content[0].text;
+  var m = text.match(/\{[\s\S]*?\}/);
+  if (!m) throw new Error("AIの応答を解析できませんでした");
+  return JSON.parse(m[0]);
+}
+
+async function gradeWithAI(question, drawings) {
+  var keys = Object.keys(drawings)
+    .filter(function(k) { return drawings[k]; })
+    .sort(function(a,b) { return parseInt(a) - parseInt(b); });
+  var urls = keys.map(function(k) { return drawings[k]; });
+  if (urls.length === 0) {
+    return { correct: false, message: "まだ何も書かれていません。マスに書いてから採点してください。" };
+  }
+  var combined = await combineCanvases(urls, 400);
+  return await callClaudeAPI(combined, question.answer);
+}
+
+function openAiSettings() {
+  var current = LS.getItem("ai_api_key") || "";
+  var masked = current ? (current.slice(0, 10) + "..." + current.slice(-4)) : "(未設定)";
+  var msg = "現在のAPIキー: " + masked + "\n\n" +
+    "新しいキーを入力（空欄でキャンセル、'clear'で削除）:";
+  var input = prompt(msg, "");
+  if (input === null || input === "") return;
+  if (input.trim().toLowerCase() === "clear") {
+    LS.removeItem("ai_api_key");
+    alert("APIキーを削除しました。");
+    return;
+  }
+  LS.setItem("ai_api_key", input.trim());
+  alert("APIキーを保存しました。");
+}
+
 function buildQCard(q, qi, ps) {
   var {before,kana,after} = parseSen(q.sentence);
   var chars = q.answer.split("");
@@ -7215,6 +7334,30 @@ function buildQCard(q, qi, ps) {
     row.appendChild(cellGroup);
     var ctrl = el("div"); ctrl.style.cssText = "display:flex;flex-direction:column;gap:8px;align-items:stretch;min-width:80px;";
     if (!shown) {
+      var aiBtn = el("button");
+      aiBtn.style.cssText=`padding:12px 16px;border-radius:14px;border:none;background:linear-gradient(135deg,#1e40af,#1e3a8a);color:white;font-weight:800;font-size:14px;cursor:pointer;font-family:inherit;white-space:nowrap;`;
+      aiBtn.textContent="🤖 AIで採点";
+      aiBtn.onclick = async function() {
+        aiBtn.disabled = true;
+        var origText = aiBtn.textContent;
+        aiBtn.textContent = "⏳ AI判定中...";
+        aiBtn.style.opacity = "0.7";
+        try {
+          var result = await gradeWithAI(q, drawn);
+          ps.verdicts[qi] = result.correct ? "correct" : "wrong";
+          ps._aiMessages = ps._aiMessages || {};
+          ps._aiMessages[qi] = result.message;
+          shown = true;
+          updateResWrap(ps);
+          rebuild();
+        } catch(err) {
+          aiBtn.disabled = false;
+          aiBtn.textContent = origText;
+          aiBtn.style.opacity = "1";
+          alert("⚠️ " + err.message);
+        }
+      };
+      ctrl.appendChild(aiBtn);
       var ab = el("button"); ab.id=`ab${qi}`;
       ab.style.cssText=`padding:12px 16px;border-radius:14px;border:none;background:linear-gradient(135deg,#c1121f,#780000);color:white;font-weight:800;font-size:14px;cursor:pointer;font-family:inherit;white-space:nowrap;`;
       ab.textContent="📖 こたえをみる"; ab.onclick=function() { shown=true; rebuild(); };
@@ -7229,6 +7372,14 @@ function buildQCard(q, qi, ps) {
       });
       var lbl=el("div"); lbl.style.cssText="font-size:10px;color:#92400e;font-weight:700;"; lbl.textContent="こたえ";
       aw.appendChild(ar); aw.appendChild(lbl); ctrl.appendChild(aw);
+      // AIフィードバック表示
+      if (ps._aiMessages && ps._aiMessages[qi]) {
+        var fb = el("div");
+        var isOk = ps.verdicts[qi] === "correct";
+        fb.style.cssText = "background:" + (isOk ? "#dcfce7" : "#fee2e2") + ";border:1.5px solid " + (isOk ? "#16a34a" : "#dc2626") + ";border-radius:10px;padding:8px 10px;font-size:11px;line-height:1.5;color:#1e1e1e;margin-top:4px;";
+        fb.innerHTML = "<div style='font-size:9px;font-weight:800;color:" + (isOk ? "#15803d" : "#b91c1c") + ";letter-spacing:1px;margin-bottom:3px;'>🤖 AIコメント</div>" + ps._aiMessages[qi];
+        ctrl.appendChild(fb);
+      }
       if (!ps.verdicts[qi]) {
         var rewBtn=el("button"); rewBtn.textContent="✏️ もう一度書く";
         rewBtn.style.cssText="padding:8px 10px;border-radius:10px;border:1.5px solid #4338ca;background:#ede9fe;color:#3730a3;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;text-align:center;width:100%;";
